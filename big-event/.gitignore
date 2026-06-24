@@ -1,0 +1,47 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ========== 本地环境配置文件（包含真实密码/密钥，绝对不能提交） ==========
+src/main/resources/application-dev.yml
+src/main/resources/application-test.yml
+src/main/resources/application-local.yml
+*.local.yml
+*.local.properties
+
+# ========== IntelliJ IDEA ==========
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# ========== Eclipse ==========
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ========== NetBeans ==========
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ========== VS Code ==========
+.vscode/
+
+# ========== Mac OS ==========
+.DS_Store
+
+# ========== Maven 临时文件 ==========
+*.log
+*.tmp
