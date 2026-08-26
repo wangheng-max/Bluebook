@@ -16,7 +16,8 @@ public class Category {
     private String categoryName;//分类名称
     @NotEmpty
     private String categoryAlias;//分类别名
-    private Integer createUser;//创建人ID
+    private Integer createUser;//创建人ID，NULL=系统内置分类
+    private Integer isSystem;//1-系统内置分类 0-用户分类
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;//创建时间

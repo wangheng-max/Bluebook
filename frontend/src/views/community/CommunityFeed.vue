@@ -1,6 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { searchNotesService } from '@/api/search.js'
+import { communityHotService, communityArticlesService } from '@/api/community.js'
+import { articleCategoryListService } from '@/api/article.js'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -12,16 +14,42 @@ const pageNum = ref(1)
 const pageSize = ref(10)
 const loading = ref(false)
 
-const searchNotes = async () => {
-    if (!keyword.value.trim()) return
+// 分类导航：全部 + 内置分类
+const categories = ref([])
+const activeCategoryId = ref('')
+
+// 当前内容形态：hot(热门) / category(按分类浏览) / search(搜索结果)
+const viewMode = ref('hot')
+
+// 加载分类导航（社区首页只展示系统内置分类，用户自建分类仅个人可见）
+const loadCategories = async () => {
+    let result = await articleCategoryListService()
+    categories.value = (result.data || []).filter(c => c.isSystem === 1)
+}
+
+// 拉取当前形态的数据
+const loadList = async () => {
     loading.value = true
     try {
-        let params = {
-            keyword: keyword.value,
-            page: pageNum.value,
-            size: pageSize.value
+        let result
+        if (viewMode.value === 'search') {
+            result = await searchNotesService({
+                keyword: keyword.value,
+                page: pageNum.value,
+                size: pageSize.value
+            })
+        } else if (viewMode.value === 'category') {
+            result = await communityArticlesService({
+                categoryId: activeCategoryId.value,
+                pageNum: pageNum.value,
+                pageSize: pageSize.value
+            })
+        } else {
+            result = await communityHotService({
+                pageNum: pageNum.value,
+                pageSize: pageSize.value
+            })
         }
-        let result = await searchNotesService(params)
         articles.value = result.data.items
         total.value = result.data.total
     } finally {
@@ -29,28 +57,51 @@ const searchNotes = async () => {
     }
 }
 
+const searchNotes = () => {
+    if (!keyword.value.trim()) {
+        // 清空搜索词回到热门
+        viewMode.value = 'hot'
+        pageNum.value = 1
+        loadList()
+        return
+    }
+    viewMode.value = 'search'
+    pageNum.value = 1
+    loadList()
+}
+
+const selectCategory = (categoryId) => {
+    activeCategoryId.value = categoryId
+    viewMode.value = categoryId ? 'category' : 'hot'
+    pageNum.value = 1
+    loadList()
+}
+
 const onPageChange = (num) => {
     pageNum.value = num
-    searchNotes()
+    loadList()
 }
 
 const onSizeChange = (size) => {
     pageSize.value = size
     pageNum.value = 1
-    searchNotes()
+    loadList()
 }
 
 const viewDetail = (noteId) => {
     router.push(`/article/detail/${noteId}`)
 }
+
+loadCategories()
+loadList()
 </script>
 
 <template>
     <el-card class="community-feed">
         <template #header>
             <div class="feed-header">
-                <span class="title">🔍 探索社区笔记</span>
-                <span class="subtitle">发现大家的精彩内容</span>
+                <span class="title">🏠 社区首页</span>
+                <span class="subtitle">热点推荐 · 分类浏览 · 发现精彩</span>
             </div>
         </template>
 
@@ -70,6 +121,24 @@ const viewDetail = (noteId) => {
                     </el-button>
                 </template>
             </el-input>
+        </div>
+
+        <!-- 分类导航条（内置分类，Redis 缓存秒开） -->
+        <div class="category-nav">
+            <el-tag
+                :type="!activeCategoryId && viewMode !== 'search' ? 'primary' : 'info'"
+                effect="dark"
+                class="cat-tag"
+                @click="selectCategory('')"
+            >🔥 热门</el-tag>
+            <el-tag
+                v-for="c in categories"
+                :key="c.id"
+                :type="activeCategoryId == c.id ? 'primary' : 'info'"
+                effect="plain"
+                class="cat-tag"
+                @click="selectCategory(c.id)"
+            >{{ c.categoryName }}</el-tag>
         </div>
 
         <!-- 文章卡片列表 -->
@@ -93,8 +162,9 @@ const viewDetail = (noteId) => {
                             <span class="author-name">{{ article.authorName }}</span>
                         </div>
                         <div class="stats">
+                            <span>👁 {{ article.viewCount || 0 }}</span>
                             <span>❤️ {{ article.likeCount || 0 }}</span>
-                            <span>💬 {{ article.commentCount || 0 }}</span>
+                            <span>⭐ {{ article.favoriteCount || 0 }}</span>
                             <span class="time">{{ formatDate(article.createTime) }}</span>
                         </div>
                     </div>
@@ -102,8 +172,9 @@ const viewDetail = (noteId) => {
             </el-card>
         </div>
 
-        <el-empty v-else-if="keyword" description="未找到相关内容，换个关键词试试" />
-        <el-empty v-else description="输入关键词，开始探索社区笔记" />
+        <el-empty v-else-if="viewMode === 'search'" description="未找到相关内容，换个关键词试试" />
+        <el-empty v-else-if="viewMode === 'category'" description="该分类下暂无文章" />
+        <el-empty v-else description="还没有热门文章，快去发布第一篇吧" />
 
         <!-- 分页 -->
         <el-pagination
@@ -148,6 +219,17 @@ function formatDate(dateStr) {
     .search-bar {
         max-width: 600px;
         margin: 0 auto 24px;
+    }
+    .category-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 24px;
+        .cat-tag {
+            cursor: pointer;
+            font-size: 14px;
+        }
     }
     .article-grid {
         display: grid;

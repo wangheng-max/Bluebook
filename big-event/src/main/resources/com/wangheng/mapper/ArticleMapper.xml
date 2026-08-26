@@ -19,11 +19,18 @@
         </where>
     </select>
 
-    <!--搜索公开笔记（关键词全文检索，使用MySQL FULLTEXT或LIKE回退）-->
+    <!--搜索公开笔记（关键词全文检索，MATCH命中ngram全文索引；单字符关键词ngram无法分词，回退LIKE）-->
     <select id="searchPublicNotes" resultType="com.wangheng.pojo.Article">
         SELECT a.* FROM article a
         WHERE a.state = '已发布'
-        AND (a.title LIKE CONCAT('%', #{keyword}, '%') OR a.content LIKE CONCAT('%', #{keyword}, '%'))
+        <choose>
+            <when test="keyword != null and keyword.trim().length() &gt; 1">
+                AND MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+            </when>
+            <otherwise>
+                AND (a.title LIKE CONCAT('%', #{keyword}, '%') OR a.content LIKE CONCAT('%', #{keyword}, '%'))
+            </otherwise>
+        </choose>
         ORDER BY a.create_time DESC
     </select>
 
@@ -33,5 +40,29 @@
         WHERE a.state = '已发布'
         AND FIND_IN_SET(#{tag}, a.tags) > 0
         ORDER BY a.create_time DESC
+    </select>
+
+    <!--社区：按分类查询已发布文章（命中 idx_category_state_time 联合索引）-->
+    <select id="listByCategory" resultType="com.wangheng.pojo.Article">
+        SELECT * FROM article
+        WHERE state = '已发布'
+        <if test="categoryId != null">
+            AND category_id = #{categoryId}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!--社区：批量按ID查询文章（热点组装，IN 保证传入顺序）-->
+    <select id="findByIds" resultType="com.wangheng.pojo.Article">
+        SELECT * FROM article
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY FIELD(id,
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
     </select>
 </mapper>

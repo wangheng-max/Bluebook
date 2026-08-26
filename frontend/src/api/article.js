@@ -1,11 +1,7 @@
 import request from '@/utils/request.js'
-import { useTokenStore } from '@/stores/token.js'
-//文章分类列表查询
+//文章分类列表查询（社区化改造后为系统内置分类，Redis 缓存）
 export const articleCategoryListService = ()=>{
-    //const tokenStore = useTokenStore();
-    //在pinia中定义的响应式数据,都不需要.value
-    //return request.get('/category',{headers:{'Authorization':tokenStore.token}})
-    return request.get('/category')
+    return request.get('/category/list')
 }
 
 //文章分类添加
@@ -32,4 +28,35 @@ export const articleListService = (params)=>{
 export const articleAddService = (articleData)=>{
     return request.post('/article',articleData);
 
+}
+
+// ===== 互动接口（点赞/收藏/转发） =====
+//点赞
+export const articleLikeService = (id)=>{
+    return request.post(`/article/${id}/like`)
+}
+
+//取消点赞
+export const articleUnlikeService = (id)=>{
+    return request.delete(`/article/${id}/like`)
+}
+
+//收藏
+export const articleFavoriteService = (id)=>{
+    return request.post(`/article/${id}/favorite`)
+}
+
+//取消收藏
+export const articleUnfavoriteService = (id)=>{
+    return request.delete(`/article/${id}/favorite`)
+}
+
+//互动状态（是否已赞/已藏 + 计数）
+export const articleInteractStatusService = (id)=>{
+    return request.get(`/article/${id}/interact-status`)
+}
+
+//转发给好友
+export const articleForwardService = (id, data)=>{
+    return request.post(`/article/${id}/forward`, data)
 }

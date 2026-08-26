@@ -2,12 +2,23 @@
 import { ref, onMounted } from 'vue'
 import { friendListService, friendDeleteService } from '@/api/friend.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { ChatDotRound } from '@element-plus/icons-vue'
+import ChatWindow from '@/components/ChatWindow.vue'
 
 const friends = ref([])
 const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(10)
 const keyword = ref('')
+
+// 聊天抽屉
+const chatVisible = ref(false)
+const chatFriend = ref({})
+
+const openChat = (friend) => {
+    chatFriend.value = friend
+    chatVisible.value = true
+}
 
 const fetchFriends = async () => {
     let params = {
@@ -67,11 +78,23 @@ onMounted(fetchFriends)
                     <div class="friend-username">@{{ f.username }}</div>
                     <div class="friend-notes">📒 {{ f.noteCount || 0 }} 篇笔记</div>
                 </div>
+                <el-button type="primary" size="small" plain @click="openChat(f)">
+                    <el-icon><ChatDotRound /></el-icon> 聊天
+                </el-button>
                 <el-button type="danger" size="small" plain @click="handleDelete(f.friendId, f.nickname)">删除</el-button>
             </div>
         </div>
 
-        <el-empty v-else description="还没有好友，去发现页面添加吧~" />
+        <!-- 聊天抽屉（WebSocket 实时聊天） -->
+        <el-drawer
+            v-model="chatVisible"
+            :title="'与 ' + (chatFriend.nickname || chatFriend.username) + ' 聊天'"
+            size="420px"
+        >
+            <ChatWindow v-if="chatVisible" :friend-id="chatFriend.friendId" :friend-name="chatFriend.nickname || chatFriend.username" />
+        </el-drawer>
+
+        <el-empty v-if="friends.length === 0" description="还没有好友，去发现页面添加吧~" />
 
         <el-pagination
             v-if="total > pageSize"

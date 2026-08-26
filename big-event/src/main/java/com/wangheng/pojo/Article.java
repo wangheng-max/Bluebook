@@ -17,7 +17,7 @@ public class Article {
     private String title;//文章标题
     @NotEmpty
     private String content;//文章内容
-    @NotEmpty
+
     @URL
     private String coverImg;//封面图像
 
@@ -29,4 +29,10 @@ public class Article {
     private Integer createUser;//创建人ID
     private LocalDateTime createTime;//创建时间
     private LocalDateTime updateTime;//更新时间
+
+    //社区扩展：计数字段（缓存定时落库）
+    private Integer viewCount;//浏览量
+    private Integer likeCount;//点赞数
+    private Integer favoriteCount;//收藏数
+    private Integer forwardCount;//转发数
 }

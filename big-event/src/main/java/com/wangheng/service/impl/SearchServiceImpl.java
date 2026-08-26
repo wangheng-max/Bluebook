@@ -6,7 +6,9 @@ import com.wangheng.mapper.ArticleMapper;
 import com.wangheng.mapper.FriendMapper;
 import com.wangheng.mapper.UserMapper;
 import com.wangheng.pojo.*;
+import com.wangheng.cache.SearchCacheService;
 import com.wangheng.service.SearchService;
+import com.wangheng.utils.NoteVOConverter;
 import com.wangheng.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,20 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private FriendMapper friendMapper;
 
+    @Autowired
+    private SearchCacheService searchCacheService;
+
+    @Autowired
+    private NoteVOConverter noteVOConverter;
+
     @Override
     public PageBean<NoteSearchVO> searchNotes(String keyword, Integer pageNum, Integer pageSize) {
+        // 先查缓存：公开笔记搜索是热点数据，缓存5分钟
+        PageBean<NoteSearchVO> cached = searchCacheService.getNotesByKeyword(keyword, pageNum, pageSize);
+        if (cached != null) {
+            return cached;
+        }
+
         PageBean<NoteSearchVO> pb = new PageBean<>();
         PageHelper.startPage(pageNum, pageSize);
 
@@ -37,17 +51,26 @@ public class SearchServiceImpl implements SearchService {
 
         List<NoteSearchVO> voList = new ArrayList<>();
         for (Article a : p.getResult()) {
-            NoteSearchVO vo = convertToNoteSearchVO(a);
+            NoteSearchVO vo = noteVOConverter.convert(a);
             voList.add(vo);
         }
 
         pb.setTotal(p.getTotal());
         pb.setItems(voList);
+
+        // 写入缓存
+        searchCacheService.putNotesByKeyword(keyword, pageNum, pageSize, pb);
         return pb;
     }
 
     @Override
     public PageBean<NoteSearchVO> searchNotesByTag(String tag, Integer pageNum, Integer pageSize) {
+        // 先查缓存
+        PageBean<NoteSearchVO> cached = searchCacheService.getNotesByTag(tag, pageNum, pageSize);
+        if (cached != null) {
+            return cached;
+        }
+
         PageBean<NoteSearchVO> pb = new PageBean<>();
         PageHelper.startPage(pageNum, pageSize);
 
@@ -56,12 +79,15 @@ public class SearchServiceImpl implements SearchService {
 
         List<NoteSearchVO> voList = new ArrayList<>();
         for (Article a : p.getResult()) {
-            NoteSearchVO vo = convertToNoteSearchVO(a);
+            NoteSearchVO vo = noteVOConverter.convert(a);
             voList.add(vo);
         }
 
         pb.setTotal(p.getTotal());
         pb.setItems(voList);
+
+        // 写入缓存
+        searchCacheService.putNotesByTag(tag, pageNum, pageSize, pb);
         return pb;
     }
 
@@ -100,40 +126,4 @@ public class SearchServiceImpl implements SearchService {
         return pb;
     }
 
-    /**
-     * 将Article转换为NoteSearchVO
-     */
-    private NoteSearchVO convertToNoteSearchVO(Article article) {
-        NoteSearchVO vo = new NoteSearchVO();
-        vo.setNoteId(article.getId());
-        vo.setTitle(article.getTitle());
-
-        // 生成摘要：去除HTML/纯文本后截取前150字
-        String content = article.getContent();
-        if (content != null) {
-            // 简单的HTML标签去除
-            String plainText = content.replaceAll("<[^>]+>", "").replaceAll("\\s+", " ").trim();
-            if (plainText.length() > 150) {
-                plainText = plainText.substring(0, 150) + "…";
-            }
-            vo.setSummary(plainText);
-        }
-
-        vo.setCoverImage(article.getCoverImg());
-        vo.setAuthorId(article.getCreateUser());
-        vo.setCreateTime(article.getCreateTime());
-        vo.setLikeCount(0);
-        vo.setCommentCount(0);
-
-        // 查询作者信息
-        if (article.getCreateUser() != null) {
-            User author = userMapper.findById(article.getCreateUser());
-            if (author != null) {
-                vo.setAuthorName(author.getUsername());
-                vo.setAuthorAvatar(author.getUserPic());
-            }
-        }
-
-        return vo;
-    }
 }

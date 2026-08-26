@@ -27,6 +27,14 @@ public class CategoryController {
         return Result.success(cs);
     }
 
+    /**
+     * 分类列表（社区扩展：系统内置分类 + 个人分类，Redis 缓存，秒开）
+     */
+    @GetMapping("/list")
+    public Result<List<Category>> listV2(){
+        return list();
+    }
+
     @GetMapping("/detail")
     public Result<Category> detail(Integer id){
         Category c = categoryService.findById(id);

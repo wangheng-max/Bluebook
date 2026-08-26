@@ -2,10 +2,12 @@ package com.wangheng.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.wangheng.cache.SearchCacheService;
 import com.wangheng.mapper.ArticleMapper;
 import com.wangheng.pojo.Article;
 import com.wangheng.pojo.PageBean;
 import com.wangheng.service.ArticleService;
+import com.wangheng.service.CategoryService;
 import com.wangheng.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +22,19 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private ArticleMapper articleMapper;
 
+    @Autowired
+    private SearchCacheService searchCacheService;
+
+    @Autowired
+    private CategoryService categoryService;
+
     @Override
     public void add(Article article) {
+        //发布校验：分类必须为系统内置分类 或 当前用户自建分类
+        if (article.getCategoryId() == null || !categoryService.isValidForUser(article.getCategoryId())) {
+            throw new RuntimeException("分类不存在，请从分类列表中选择");
+        }
+
         //补充属性值
         article.setCreateTime(LocalDateTime.now());
         article.setUpdateTime(LocalDateTime.now());
@@ -31,6 +44,9 @@ public class ArticleServiceImpl implements ArticleService {
         article.setCreateUser(userId);
 
         articleMapper.add(article);
+
+        // 文章写入后公开笔记搜索结果可能变化，清除搜索缓存
+        searchCacheService.evictNotes();
     }
 
     @Override

@@ -24,6 +24,11 @@ export default defineConfig({
           target:'http://localhost:8080',//后台服务所在的源
           changeOrigin:true,//修改源
           rewrite:(path)=>path.replace(/^\/api/,'')///api替换为''
+      },
+      '/ws':{//WebSocket 聊天通道代理
+          target:'ws://localhost:8080',
+          changeOrigin:true,
+          ws:true
       }
     }
   }
