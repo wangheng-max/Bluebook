@@ -11,15 +11,48 @@ import {
     HomeFilled,
     Search,
     ChatDotSquare,
-    Connection
+    Connection,
+    Goods,
+    Ticket,
+    List,
+    Location,
+    Shop,
+    Sell,
+    Discount,
+    ShoppingCart,
+    Checked,
+    Grid,
+    Files
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 
 import {userInfoService} from '@/api/user.js'
 import useUserInfoStore from '@/stores/userInfo.js'
 import {useTokenStore} from '@/stores/token.js'
+import useRoleInfoStore from '@/stores/roleInfo.js'
+import { merchantStatusService } from '@/api/merchant.js'
+import { ref } from 'vue'
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
+const roleStore = useRoleInfoStore();
+
+//管理员身份：仅管理员（user_role.role_type=3）渲染"平台管理"菜单
+const loadAdminStatus = async () => {
+    await roleStore.loadAdminStatus()
+}
+loadAdminStatus()
+
+//商家认证状态：认证通过才展开完整商家中心，否则只显示"商家入驻"
+const isMerchant = ref(false)
+const loadMerchantStatus = async () => {
+    try {
+        const result = await merchantStatusService()
+        isMerchant.value = !!result.data && result.data.merchantStatus === 1
+    } catch (e) {
+        isMerchant.value = false
+    }
+}
+loadMerchantStatus()
 //调用函数,获取用户详细信息
 const getUserInfo = async()=>{
     //调用接口
@@ -48,9 +81,10 @@ const handleCommand = (command)=>{
     )
         .then(async () => {
             //退出登录
-            //1.清空pinia中存储的token以及个人信息
+            //1.清空pinia中存储的token、个人信息以及角色状态
             tokenStore.removeToken()
             userInfoStore.removeInfo()
+            roleStore.reset()
 
             //2.跳转到登录页面
             router.push('/login')
@@ -106,6 +140,93 @@ const handleCommand = (command)=>{
                     <el-icon><ChatDotSquare /></el-icon>
                     <span>好友请求</span>
                 </el-menu-item>
+                <!-- 商城（用户侧） -->
+                <el-sub-menu index="mall">
+                    <template #title>
+                        <el-icon><Goods /></el-icon>
+                        <span>商城</span>
+                    </template>
+                    <el-menu-item index="/mall">
+                        <el-icon><HomeFilled /></el-icon>
+                        <span>商城首页</span>
+                    </el-menu-item>
+                    <el-menu-item index="/mall/group-buy">
+                        <el-icon><Sell /></el-icon>
+                        <span>团购专区</span>
+                    </el-menu-item>
+                    <el-menu-item index="/mall/coupon">
+                        <el-icon><Ticket /></el-icon>
+                        <span>抢券中心</span>
+                    </el-menu-item>
+                    <el-menu-item index="/mall/my-order">
+                        <el-icon><List /></el-icon>
+                        <span>我的订单</span>
+                    </el-menu-item>
+                    <el-menu-item index="/mall/my-coupon">
+                        <el-icon><Discount /></el-icon>
+                        <span>我的优惠券</span>
+                    </el-menu-item>
+                    <el-menu-item index="/mall/my-group-buy">
+                        <el-icon><ShoppingCart /></el-icon>
+                        <span>我的团购</span>
+                    </el-menu-item>
+                    <el-menu-item index="/user/address">
+                        <el-icon><Location /></el-icon>
+                        <span>收货地址</span>
+                    </el-menu-item>
+                </el-sub-menu>
+                <!-- 商家中心：认证通过展开完整功能，未通过只显示入驻入口 -->
+                <el-sub-menu index="merchant">
+                    <template #title>
+                        <el-icon><Shop /></el-icon>
+                        <span>商家中心</span>
+                    </template>
+                    <template v-if="isMerchant">
+                        <el-menu-item index="/merchant/home">
+                            <el-icon><Shop /></el-icon>
+                            <span>商家概览</span>
+                        </el-menu-item>
+                        <el-menu-item index="/merchant/products">
+                            <el-icon><Goods /></el-icon>
+                            <span>商品管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="/merchant/group-buys">
+                            <el-icon><Sell /></el-icon>
+                            <span>团购管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="/merchant/coupons">
+                            <el-icon><Ticket /></el-icon>
+                            <span>优惠券管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="/merchant/orders">
+                            <el-icon><List /></el-icon>
+                            <span>订单管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="/merchant/refunds">
+                            <el-icon><Files /></el-icon>
+                            <span>退款审核</span>
+                        </el-menu-item>
+                    </template>
+                    <el-menu-item v-else index="/merchant/apply">
+                        <el-icon><Files /></el-icon>
+                        <span>商家入驻</span>
+                    </el-menu-item>
+                </el-sub-menu>
+                <!-- 平台管理：仅管理员可见（后端接口另有 @RequireAdmin 403 兜底） -->
+                <el-sub-menu v-if="roleStore.isAdmin" index="admin">
+                    <template #title>
+                        <el-icon><Checked /></el-icon>
+                        <span>平台管理</span>
+                    </template>
+                    <el-menu-item index="/admin/merchants">
+                        <el-icon><Shop /></el-icon>
+                        <span>商家审核</span>
+                    </el-menu-item>
+                    <el-menu-item index="/admin/product-categories">
+                        <el-icon><Grid /></el-icon>
+                        <span>商品分类</span>
+                    </el-menu-item>
+                </el-sub-menu>
                 <el-sub-menu >
                     <template #title>
                         <el-icon><UserFilled /></el-icon>

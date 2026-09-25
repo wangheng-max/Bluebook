@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangheng.mapper.ProductMapper">
+
+    <!-- 商品列表：公开查询，分类/状态动态筛选 -->
+    <select id="list" resultType="com.wangheng.pojo.Product">
+        select * from product
+        <where>
+            <if test="categoryId != null">and category_id = #{categoryId}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <!-- 商家商品管理：只看自己的商品（数据隔离） -->
+    <select id="listOwn" resultType="com.wangheng.pojo.Product">
+        select * from product
+        <where>
+            create_user_id = #{userId}
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <!-- 商品搜索：仅上架商品，关键词/分类/价格区间动态筛选 -->
+    <select id="search" resultType="com.wangheng.pojo.Product">
+        select * from product
+        <where>
+            status = 1
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%', #{keyword}, '%') or description like concat('%', #{keyword}, '%'))
+            </if>
+            <if test="categoryId != null">and category_id = #{categoryId}</if>
+            <if test="minPrice != null">and price &gt;= #{minPrice}</if>
+            <if test="maxPrice != null">and price &lt;= #{maxPrice}</if>
+        </where>
+        order by sales_count desc, id desc
+    </select>
+
+</mapper>

@@ -109,6 +109,12 @@
       <artifactId>spring-boot-starter-websocket</artifactId>
     </dependency>
 
+    <!--aop坐标（商城商家权限注解 @RequireMerchant/@RequireAdmin 切面）-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-aop</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

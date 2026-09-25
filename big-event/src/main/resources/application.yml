@@ -1,3 +1,8 @@
 spring:
   profiles:
     active: dev
+  servlet:
+    multipart:
+      # 默认单文件仅 1MB，商品图片/视频必超限，显式放开
+      max-file-size: 50MB
+      max-request-size: 100MB

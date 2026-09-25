@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangheng.mapper.GroupBuyMapper">
+
+    <!-- 团购活动列表：公开查询，状态动态筛选，按开始时间倒序 -->
+    <select id="list" resultType="com.wangheng.pojo.GroupBuy">
+        select * from group_buy
+        <where>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <!-- 商家团购管理：只看自己的活动（数据隔离） -->
+    <select id="listOwn" resultType="com.wangheng.pojo.GroupBuy">
+        select * from group_buy
+        <where>
+            create_user_id = #{userId}
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <!-- 我参与过的团购活动 -->
+    <select id="listJoined" resultType="com.wangheng.pojo.GroupBuy">
+        select * from group_buy
+        where exists (select 1 from group_buy_record r where r.group_buy_id = group_buy.id and r.user_id = #{userId})
+        order by id desc
+    </select>
+
+</mapper>

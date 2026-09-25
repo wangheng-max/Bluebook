@@ -22,8 +22,26 @@ const checkRePassword = (rule, value, callback) => {
     }
 }
 
-//定义表单校验规则
-const rules = {
+//密码格式：6-16位，须同时包含字母和数字（与后端校验一致，登录不校验格式，兼容老账号）
+const PWD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)\S{6,16}$/
+
+//注册表单校验规则（密码带格式要求）
+const registerRules = {
+    username: [
+        { required: true, message: '请输入用户名', trigger: 'blur' },
+        { min: 5, max: 16, message: '长度为5~16位非空字符', trigger: 'blur' }
+    ],
+    password: [
+        { required: true, message: '请输入密码', trigger: 'blur' },
+        { pattern: PWD_PATTERN, message: '密码为6-16位，且必须同时包含字母和数字', trigger: 'blur' }
+    ],
+    rePassword: [
+        { validator: checkRePassword, trigger: 'blur' }
+    ]
+}
+
+//登录表单校验规则（老账号密码可能是旧格式，只做基本长度校验）
+const loginRules = {
     username: [
         { required: true, message: '请输入用户名', trigger: 'blur' },
         { min: 5, max: 16, message: '长度为5~16位非空字符', trigger: 'blur' }
@@ -31,9 +49,6 @@ const rules = {
     password: [
         { required: true, message: '请输入密码', trigger: 'blur' },
         { min: 5, max: 16, message: '长度为5~16位非空字符', trigger: 'blur' }
-    ],
-    rePassword: [
-        { validator: checkRePassword, trigger: 'blur' }
     ]
 }
 
@@ -91,19 +106,22 @@ const clearRegisterData = ()=>{
         <el-col :span="12" class="bg"></el-col>
         <el-col :span="6" :offset="3" class="form">
             <!-- 注册表单 -->
-            <el-form ref="form" size="large" autocomplete="off" v-if="isRegister" :model="registerData" :rules="rules">
+            <el-form ref="form" size="large" autocomplete="off" v-if="isRegister" :model="registerData" :rules="registerRules">
                 <el-form-item>
                     <h1>注册</h1>
                 </el-form-item>
                 <el-form-item prop="username">
-                    <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
+                    <el-input :prefix-icon="User" placeholder="请输入用户名（5-16位）" v-model="registerData.username"></el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码"
+                    <el-input :prefix-icon="Lock" type="password" show-password placeholder="请输入密码"
                         v-model="registerData.password"></el-input>
                 </el-form-item>
+                <el-form-item>
+                    <div class="pwd-tip">密码由 6-16 位字符组成，须同时包含字母和数字，例如：abc12345</div>
+                </el-form-item>
                 <el-form-item prop="rePassword">
-                    <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码"
+                    <el-input :prefix-icon="Lock" type="password" show-password placeholder="请输入再次密码"
                         v-model="registerData.rePassword"></el-input>
                 </el-form-item>
                 <!-- 注册按钮 -->
@@ -119,7 +137,7 @@ const clearRegisterData = ()=>{
                 </el-form-item>
             </el-form>
             <!-- 登录表单 -->
-            <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="rules">
+            <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="loginRules">
                 <el-form-item>
                     <h1>登录</h1>
                 </el-form-item>
@@ -181,6 +199,13 @@ const clearRegisterData = ()=>{
             width: 100%;
             display: flex;
             justify-content: space-between;
+        }
+
+        .pwd-tip {
+            color: #999;
+            font-size: 12px;
+            line-height: 1.4;
+            text-align: left;
         }
     }
 }

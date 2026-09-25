@@ -24,6 +24,9 @@ const checkRePassword = (rule, value, callback) => {
     }
 }
 
+//密码格式：6-16位，须同时包含字母和数字（与后端校验一致）
+const PWD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)\S{6,16}$/
+
 //表单校验规则
 const rules = {
     old_pwd: [
@@ -32,7 +35,7 @@ const rules = {
     ],
     new_pwd: [
         { required: true, message: '请输入新密码', trigger: 'blur' },
-        { min: 5, max: 16, message: '长度为5~16位非空字符', trigger: 'blur' }
+        { pattern: PWD_PATTERN, message: '新密码为6-16位，且必须同时包含字母和数字', trigger: 'blur' }
     ],
     re_pwd: [
         { validator: checkRePassword, trigger: 'blur' }
@@ -70,7 +73,9 @@ const updatePassword = async () => {
                         <el-input v-model="passwordData.old_pwd" type="password" show-password></el-input>
                     </el-form-item>
                     <el-form-item label="新密码" prop="new_pwd">
-                        <el-input v-model="passwordData.new_pwd" type="password" show-password></el-input>
+                        <el-input v-model="passwordData.new_pwd" type="password" show-password
+                            placeholder="6-16位，须含字母和数字"></el-input>
+                        <div class="pwd-tip">密码由 6-16 位字符组成，须同时包含字母和数字，例如：abc12345</div>
                     </el-form-item>
                     <el-form-item label="确认新密码" prop="re_pwd">
                         <el-input v-model="passwordData.re_pwd" type="password" show-password></el-input>
@@ -83,3 +88,14 @@ const updatePassword = async () => {
         </el-row>
     </el-card>
 </template>
+
+<style lang="scss" scoped>
+.pwd-tip {
+    width: 100%;
+    color: #999;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-top: 4px;
+    text-align: left;
+}
+</style>

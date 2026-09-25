@@ -30,7 +30,8 @@ public class UserController {
     private StringRedisTemplate stringRedisTemplate;
 
     @PostMapping("/register")
-    public Result register(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{5,16}$") String password) {
+    public Result register(@Pattern(regexp = "^\\S{5,16}$", message = "用户名需为5-16位非空字符") String username,
+                           @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)\\S{6,16}$", message = "密码需为6-16位，且必须同时包含字母和数字") String password) {
 
         //查询用户
         User u = userService.findByUserName(username);
@@ -102,6 +103,11 @@ public class UserController {
 
         if (!StringUtils.hasLength(oldPwd) || !StringUtils.hasLength(newPwd) || !StringUtils.hasLength(rePwd)) {
             return Result.error("缺少必要的参数");
+        }
+
+        //新密码格式：6-16位且必须同时包含字母和数字（与注册规则一致）
+        if (!newPwd.matches("^(?=.*[A-Za-z])(?=.*\\d)\\S{6,16}$")) {
+            return Result.error("新密码需为6-16位，且必须同时包含字母和数字");
         }
 
         //原密码是否正确

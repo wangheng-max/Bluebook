@@ -12,6 +12,7 @@ import {
     articleForwardService
 } from '@/api/article.js'
 import { friendListService } from '@/api/friend.js'
+import CommentSection from '@/components/CommentSection.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -143,6 +144,9 @@ onMounted(() => {
 
             <el-empty v-else description="加载中..." />
         </el-card>
+
+        <!-- 评论区（文章笔记评论：点赞/回复/按时间与点赞排序） -->
+        <CommentSection v-if="article.noteId" target-type="article" :target-id="Number(noteId)" />
 
         <!-- 转发好友选择弹窗 -->
         <el-dialog v-model="forwardVisible" title="转发给好友" width="400px">

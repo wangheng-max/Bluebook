@@ -1,71 +1,84 @@
 package com.wangheng.utils;
 
-import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
-import com.aliyun.oss.model.PutObjectResult;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 
+/**
+ * 阿里云 OSS 上传工具。
+ * 注意：字段必须是非 static 且带 setter，@ConfigurationProperties 才能把
+ * application-*.yml 中 aliyun.oss.* 的配置绑定进来（static 字段 Spring 不做绑定）。
+ */
+@Data
 @Component
 @ConfigurationProperties(prefix = "aliyun.oss")
 public class AliOssUtil {
 
-    // Endpoint以华东1（杭州）为例，其它Region请按实际情况填写。
-    private static  String ENDPOINT ;
-    // 从环境变量中获取访问凭证。运行本代码示例之前，请确保已设置环境变量OSS_ACCESS_KEY_ID和OSS_ACCESS_KEY_SECRET。
-    //EnvironmentVariableCredentialsProvider credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
-    private static  String ACCESS_KEY_ID;
-    private static  String ACCESS_KEY_SECRET;
-    // 填写Bucket名称，例如examplebucket。
-    private static  String BUCKET_NAME ;
+    /** Endpoint，如 https://oss-cn-beijing.aliyuncs.com */
+    private String endpoint;
+    /** 访问密钥 ID */
+    private String accessKeyId;
+    /** 访问密钥 Secret */
+    private String accessKeySecret;
+    /** Bucket 名称 */
+    private String bucketName;
 
-    public static String uploadFile(String objectName, InputStream in) throws Exception {
-
-
-        // 创建OSSClient实例。
-        OSS ossClient = new OSSClientBuilder().build(ENDPOINT,ACCESS_KEY_ID, ACCESS_KEY_SECRET);
-        String url = "";
+    /**
+     * 上传文件到 OSS，返回访问 URL：https://{bucket}.{endpoint域名}/{objectName}
+     * 上传失败时抛出 OSS 异常，由 GlobalExceptionHandler 统一返回错误提示
+     */
+    public String uploadFile(String objectName, InputStream in) {
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         try {
-            // 填写字符串。
-            String content = "Hello OSS，你好世界";
-
-            // 创建PutObjectRequest对象。
-            PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, objectName, in);
-
-            // 如果需要上传时设置存储类型和访问权限，请参考以下示例代码。
-            // ObjectMetadata metadata = new ObjectMetadata();
-            // metadata.setHeader(OSSHeaders.OSS_STORAGE_CLASS, StorageClass.Standard.toString());
-            // metadata.setObjectAcl(CannedAccessControlList.Private);
-            // putObjectRequest.setMetadata(metadata);
-
-            // 上传字符串。
-            PutObjectResult result = ossClient.putObject(putObjectRequest);
+            // 不设置 ContentType 时 OSS 存为 application/octet-stream，
+            // Safari/iOS 播放视频、部分浏览器渲染图片会被拒，需按扩展名显式指定
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(resolveContentType(objectName));
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, objectName, in, metadata);
+            ossClient.putObject(putObjectRequest);
             //url组成: https://bucket名称.区域节点/objectName
-            url = "https://"+BUCKET_NAME+"."+ENDPOINT.substring(ENDPOINT.lastIndexOf("/")+1)+"/"+objectName;
-        } catch (OSSException oe) {
-            System.out.println("Caught an OSSException, which means your request made it to OSS, "
-                    + "but was rejected with an error response for some reason.");
-            System.out.println("Error Message:" + oe.getErrorMessage());
-            System.out.println("Error Code:" + oe.getErrorCode());
-            System.out.println("Request ID:" + oe.getRequestId());
-            System.out.println("Host ID:" + oe.getHostId());
-        } catch (ClientException ce) {
-            System.out.println("Caught an ClientException, which means the client encountered "
-                    + "a serious internal problem while trying to communicate with OSS, "
-                    + "such as not being able to access the network.");
-            System.out.println("Error Message:" + ce.getMessage());
+            return "https://" + bucketName + "." + endpoint.substring(endpoint.lastIndexOf("/") + 1) + "/" + objectName;
         } finally {
-            if (ossClient != null) {
-                ossClient.shutdown();
-            }
+            ossClient.shutdown();
         }
+    }
 
-        return url;
+    /** 按扩展名映射浏览器可识别的 MIME 类型，未知类型保持 application/octet-stream */
+    private String resolveContentType(String objectName) {
+        String name = objectName.toLowerCase();
+        int dot = name.lastIndexOf('.');
+        String ext = dot < 0 ? "" : name.substring(dot + 1);
+        switch (ext) {
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            case "gif":
+                return "image/gif";
+            case "webp":
+                return "image/webp";
+            case "bmp":
+                return "image/bmp";
+            case "svg":
+                return "image/svg+xml";
+            case "mp4":
+                return "video/mp4";
+            case "webm":
+                return "video/webm";
+            case "ogg":
+            case "ogv":
+                return "video/ogg";
+            case "mov":
+                return "video/quicktime";
+            default:
+                return "application/octet-stream";
+        }
     }
 }

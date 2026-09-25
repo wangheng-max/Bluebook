@@ -1,0 +1,16 @@
+package com.wangheng.anno;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * 管理员权限注解（v1.1 商家认证机制）。
+ * 标注在管理员接口（如商家审核/封禁）上，由 RoleAuthAspect 切面校验
+ * user_role 管理员角色生效(status=1)，校验失败抛 MerchantAuthException（HTTP 403）。
+ */
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface RequireAdmin {
+}

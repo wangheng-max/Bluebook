@@ -8,6 +8,7 @@ import com.wangheng.pojo.NoteSearchVO;
 import com.wangheng.pojo.PageBean;
 import com.wangheng.service.CommunityService;
 import com.wangheng.utils.NoteVOConverter;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Autowired
     private ArticleMapper articleMapper;
 
-    @Autowired
+    @Resource
     private StringRedisTemplate stringRedisTemplate;
 
     @Autowired

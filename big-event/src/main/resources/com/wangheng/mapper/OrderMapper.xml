@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangheng.mapper.OrderMapper">
+
+    <!-- 我的订单：状态动态筛选 -->
+    <select id="myList" resultType="com.wangheng.pojo.Order">
+        select * from t_order
+        <where>
+            user_id = #{userId}
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <!-- 商家订单：含本店商品的订单（数据隔离） -->
+    <select id="listMerchant" resultType="com.wangheng.pojo.Order">
+        select o.* from t_order o
+        where exists (
+            select 1 from order_item oi
+            join product p on oi.product_id = p.id
+            where oi.order_id = o.id and p.create_user_id = #{userId}
+        )
+        <if test="status != null">and o.status = #{status}</if>
+        order by o.id desc
+    </select>
+
+    <!-- 超时未支付订单（30 分钟） -->
+    <select id="findTimeoutOrders" resultType="com.wangheng.pojo.Order">
+        select * from t_order where status = 0 and create_time &lt; #{deadline} order by id asc
+    </select>
+
+</mapper>
