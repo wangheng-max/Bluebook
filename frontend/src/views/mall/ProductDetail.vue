@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, ShoppingCart } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { productDetailService, productSkuListService } from '@/api/product.js'
+import { shopInfoService } from '@/api/shop.js'
 import { money } from '@/utils/mall.js'
 import CommentSection from '@/components/CommentSection.vue'
 
@@ -13,6 +14,7 @@ const router = useRouter()
 const productId = Number(route.params.id)
 const product = ref({})
 const skus = ref([])
+const shop = ref(null) // 商品所属店铺（认证商家才有）
 const selectedSkuId = ref(null)
 const quantity = ref(1)
 const loading = ref(false)
@@ -74,6 +76,15 @@ const loadDetail = async () => {
         skus.value = []
     } finally {
         loading.value = false
+    }
+    // 店铺信息（商家认证店铺才有）：失败不影响商品主体展示
+    try {
+        if (product.value.createUserId) {
+            const shopResult = await shopInfoService(product.value.createUserId)
+            shop.value = shopResult.data || null
+        }
+    } catch (e) {
+        shop.value = null
     }
 }
 
@@ -142,6 +153,25 @@ loadDetail()
                     <span>销量 {{ product.salesCount || 0 }}</span>
                     <span>浏览 {{ product.viewCount || 0 }}</span>
                     <span>库存 {{ availableStock }}</span>
+                </div>
+
+                <!-- 店铺卡片：评分 + 进店看全部商品 -->
+                <div class="shop-card" v-if="shop" @click="router.push(`/mall/shop/${shop.userId}`)">
+                    <el-avatar :size="40" :src="shop.shopLogo" shape="square">
+                        {{ shop.shopName?.charAt(0) }}
+                    </el-avatar>
+                    <div class="shop-mid">
+                        <div class="shop-name">{{ shop.shopName }}</div>
+                        <div class="shop-score">
+                            <el-rate v-if="shop.avgScore" :model-value="shop.avgScore" disabled allow-half
+                                size="small" />
+                            <span class="score-text">
+                                {{ shop.avgScore ? shop.avgScore.toFixed(1) + ' 分' : '暂无评分' }}
+                                · {{ shop.ratingCount }} 人评价 · {{ shop.productCount }} 件商品
+                            </span>
+                        </div>
+                    </div>
+                    <el-button type="warning" size="small" round plain>进店 ></el-button>
                 </div>
 
                 <!-- SKU 规格选择 -->
@@ -250,6 +280,41 @@ loadDetail()
                 color: #999;
                 font-size: 13px;
                 margin: 16px 0;
+            }
+
+            .shop-card {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px;
+                border: 1px solid #ebeef5;
+                border-radius: 10px;
+                margin-bottom: 16px;
+                cursor: pointer;
+                transition: box-shadow 0.2s;
+
+                &:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+
+                .shop-mid {
+                    flex: 1;
+                    min-width: 0;
+
+                    .shop-name {
+                        font-weight: 600;
+                        margin-bottom: 4px;
+                    }
+
+                    .shop-score {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+
+                        .score-text {
+                            color: #999;
+                            font-size: 12px;
+                        }
+                    }
+                }
             }
 
             .sku-block,

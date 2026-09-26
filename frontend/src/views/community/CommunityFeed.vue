@@ -1,11 +1,13 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { searchNotesService } from '@/api/search.js'
+import { useRoute } from 'vue-router'
+import { searchNotesService, searchNotesByTagService } from '@/api/search.js'
 import { communityHotService, communityArticlesService } from '@/api/community.js'
 import { articleCategoryListService } from '@/api/article.js'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 
 const keyword = ref('')
 const articles = ref([])
@@ -18,7 +20,10 @@ const loading = ref(false)
 const categories = ref([])
 const activeCategoryId = ref('')
 
-// 当前内容形态：hot(热门) / category(按分类浏览) / search(搜索结果)
+// 当前标签（点击任意标签进入标签检索模式，路由 query 驱动）
+const activeTag = ref('')
+
+// 当前内容形态：hot(热门) / category(按分类浏览) / search(搜索结果) / tag(标签检索)
 const viewMode = ref('hot')
 
 // 加载分类导航（社区首页只展示系统内置分类，用户自建分类仅个人可见）
@@ -35,6 +40,12 @@ const loadList = async () => {
         if (viewMode.value === 'search') {
             result = await searchNotesService({
                 keyword: keyword.value,
+                page: pageNum.value,
+                size: pageSize.value
+            })
+        } else if (viewMode.value === 'tag') {
+            result = await searchNotesByTagService({
+                tag: activeTag.value,
                 page: pageNum.value,
                 size: pageSize.value
             })
@@ -77,6 +88,27 @@ const selectCategory = (categoryId) => {
     loadList()
 }
 
+// 点击标签 → 标签检索模式（其他页面跳转 /community/feed?tag=xx 也走这里）
+const selectTag = (tag) => {
+    router.push({ path: '/community/feed', query: { tag } })
+}
+
+const clearTag = () => {
+    router.push({ path: '/community/feed' })
+}
+
+// 路由 query 变化驱动标签模式（含从其他页面点标签跳回来的场景）
+watch(() => route.query.tag, (tag) => {
+    activeTag.value = tag || ''
+    if (tag) {
+        viewMode.value = 'tag'
+    } else if (viewMode.value === 'tag') {
+        viewMode.value = 'hot'
+    }
+    pageNum.value = 1
+    loadList()
+}, { immediate: true })
+
 const onPageChange = (num) => {
     pageNum.value = num
     loadList()
@@ -92,8 +124,11 @@ const viewDetail = (noteId) => {
     router.push(`/article/detail/${noteId}`)
 }
 
+const goProduct = (productId) => {
+    router.push(`/mall/product/${productId}`)
+}
+
 loadCategories()
-loadList()
 </script>
 
 <template>
@@ -141,6 +176,14 @@ loadList()
             >{{ c.categoryName }}</el-tag>
         </div>
 
+        <!-- 标签检索模式横幅 -->
+        <el-alert v-if="viewMode === 'tag'" type="primary" :closable="true" class="tag-banner"
+            @close="clearTag">
+            <template #title>
+                标签检索：<b># {{ activeTag }}</b>　共 {{ total }} 篇相关文章
+            </template>
+        </el-alert>
+
         <!-- 文章卡片列表 -->
         <div class="article-grid" v-if="articles.length > 0">
             <el-card
@@ -154,6 +197,25 @@ loadList()
                 <div class="card-content">
                     <h3 class="article-title">{{ article.title }}</h3>
                     <p class="article-summary">{{ article.summary }}</p>
+
+                    <!-- 标签：点击直接检索该标签（与带货商品区分开） -->
+                    <div class="tag-row" v-if="article.tags && article.tags.length">
+                        <el-tag v-for="t in article.tags.slice(0, 3)" :key="t" size="small" effect="plain"
+                            class="feed-tag" @click.stop="selectTag(t)"># {{ t }}</el-tag>
+                        <el-tag v-if="article.tags.length > 3" size="small" type="info" effect="plain">
+                            +{{ article.tags.length - 3 }}
+                        </el-tag>
+                    </div>
+
+                    <!-- 带货商品：点击直接跳商品页购买 -->
+                    <div class="product-chip" v-if="article.products && article.products.length"
+                        @click.stop="goProduct(article.products[0].id)">
+                        <span class="chip-icon">🛍</span>
+                        <span class="chip-name">{{ article.products[0].name }}</span>
+                        <span class="chip-price">¥{{ article.products[0].price }}</span>
+                        <span class="chip-go">去看看 →</span>
+                    </div>
+
                     <div class="article-meta">
                         <div class="author-info">
                             <el-avatar :size="24" :src="article.authorAvatar">
@@ -173,6 +235,7 @@ loadList()
         </div>
 
         <el-empty v-else-if="viewMode === 'search'" description="未找到相关内容，换个关键词试试" />
+        <el-empty v-else-if="viewMode === 'tag'" :description="`还没有带「# ${activeTag}」标签的文章`" />
         <el-empty v-else-if="viewMode === 'category'" description="该分类下暂无文章" />
         <el-empty v-else description="还没有热门文章，快去发布第一篇吧" />
 
@@ -219,6 +282,42 @@ function formatDate(dateStr) {
     .search-bar {
         max-width: 600px;
         margin: 0 auto 24px;
+    }
+    .tag-banner {
+        margin-bottom: 20px;
+    }
+    .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 10px;
+        .feed-tag {
+            cursor: pointer;
+        }
+    }
+    .product-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        margin-bottom: 12px;
+        background: #fff7f0;
+        border: 1px solid #ffe3c9;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: box-shadow 0.2s;
+        &:hover { box-shadow: 0 2px 8px rgba(230, 140, 60, 0.15); }
+        .chip-icon { font-size: 16px; }
+        .chip-name {
+            flex: 1;
+            font-size: 13px;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .chip-price { color: #f56c6c; font-weight: bold; font-size: 13px; }
+        .chip-go { color: #e68c3c; font-size: 12px; white-space: nowrap; }
     }
     .category-nav {
         display: flex;

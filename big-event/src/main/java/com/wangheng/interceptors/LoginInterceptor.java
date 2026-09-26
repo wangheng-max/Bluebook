@@ -38,6 +38,9 @@ public class LoginInterceptor implements HandlerInterceptor {
     /** 评论回复列表（评论模块：商品详情页匿名可读，登录态照常解析以标记点赞状态） */
     private static final Pattern PUBLIC_COMMENT_REPLY_PATH = Pattern.compile("^/comment/\\d+/replies$");
 
+    /** 店铺主页公开读接口（店铺信息/在架商品/评价列表，内容电商 v1.2） */
+    private static final Pattern PUBLIC_SHOP_PATH = Pattern.compile("^/shop/\\d+(/(products|ratings))?$");
+
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Override
@@ -97,7 +100,8 @@ public class LoginInterceptor implements HandlerInterceptor {
         return PUBLIC_MALL_EXACT_PATHS.contains(path)
                 || PUBLIC_MALL_ID_PATH.matcher(path).matches()
                 || PUBLIC_MALL_SKU_PATH.matcher(path).matches()
-                || PUBLIC_COMMENT_REPLY_PATH.matcher(path).matches();
+                || PUBLIC_COMMENT_REPLY_PATH.matcher(path).matches()
+                || PUBLIC_SHOP_PATH.matcher(path).matches();
     }
 
     @Override

@@ -1,8 +1,17 @@
 package com.wangheng.auth;
 
+import com.wangheng.merchant.mapper.MerchantInfoMapper;
+import com.wangheng.user.mapper.UserRoleMapper;
+
+
+
+
+
+
+
 import com.wangheng.exception.MerchantAuthException;
-import com.wangheng.mapper.MerchantInfoMapper;
-import com.wangheng.mapper.UserRoleMapper;
+
+
 import com.wangheng.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

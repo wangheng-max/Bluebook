@@ -137,13 +137,58 @@ const articleModel = ref({
     coverImg: '',
     content: '',
     state: '',
-    tags: ''
+    tags: '',
+    productIds: ''
 })
 
 
 //导入token
 import { useTokenStore } from '@/stores/token.js';
 const tokenStore = useTokenStore();
+
+// ===== 标签（可选可自建）与带货商品（内容电商打通） =====
+import { communityHotTagsService } from '@/api/community.js'
+import { productSearchService } from '@/api/product.js'
+import { ref as vueRef } from 'vue'
+
+//热门标签（后端统计近期文章词频，供联想选择）
+const hotTags = vueRef([])
+const loadHotTags = async () => {
+    try {
+        const result = await communityHotTagsService(12)
+        hotTags.value = result.data || []
+    } catch (e) {
+        hotTags.value = []
+    }
+}
+loadHotTags()
+
+//文章标签：数组模型，提交时转逗号分隔字符串
+const tagList = vueRef([])
+
+//带货商品：远程搜索选择，选中值为商品ID数组，提交时转逗号分隔 ID 串
+const productIds = vueRef([]) // [id]
+const productOptions = vueRef([])
+const productSearchLoading = vueRef(false)
+const searchProducts = async (query) => {
+    if (!query || !query.trim()) {
+        productOptions.value = []
+        return
+    }
+    productSearchLoading.value = true
+    try {
+        const result = await productSearchService({ keyword: query.trim(), pageNum: 1, pageSize: 10 })
+        productOptions.value = (result.data.items || []).map(p => ({
+            id: p.id,
+            name: p.name,
+            price: p.price
+        }))
+    } catch (e) {
+        productOptions.value = []
+    } finally {
+        productSearchLoading.value = false
+    }
+}
 
 //上传成功的回调函数
 const uploadSuccess = (result)=>{
@@ -157,6 +202,10 @@ const addArticle = async (clickState)=>{
     //把发布状态赋值给数据模型
     articleModel.value.state = clickState;
 
+    //标签与带货商品转存储格式（tags: 逗号分隔；product_ids: 逗号分隔ID）
+    articleModel.value.tags = tagList.value.join(',')
+    articleModel.value.productIds = productIds.value.join(',')
+
     //调用接口
     let result = await articleAddService(articleModel.value);
 
@@ -164,6 +213,12 @@ const addArticle = async (clickState)=>{
 
     //让抽屉消失
     visibleDrawer.value = false;
+
+    //清空表单
+    tagList.value = []
+    productIds.value = []
+    productOptions.value = []
+    articleModel.value = { title: '', categoryId: '', coverImg: '', content: '', state: '', tags: '', productIds: '' }
 
     //刷新当前列表
     articleList()
@@ -256,7 +311,28 @@ const addArticle = async (clickState)=>{
                     </el-upload>
                 </el-form-item>
                 <el-form-item label="文章标签">
-                    <el-input v-model="articleModel.tags" placeholder="多个标签用逗号分隔，如：Java,Spring,Vue"></el-input>
+                    <el-select v-model="tagList" multiple filterable allow-create default-first-option
+                        :reserve-keyword="false" placeholder="选择或输入标签，回车确认（最多 5 个）"
+                        style="width: 100%" :multiple-limit="5">
+                        <el-option v-for="t in hotTags" :key="t" :label="`# ${t}`" :value="t">
+                            <span># {{ t }}</span>
+                            <span style="float:right;color:#bbb;font-size:12px">热门</span>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="带货商品">
+                    <el-select v-model="productIds" multiple filterable remote reserve-keyword
+                        :remote-method="searchProducts" :loading="productSearchLoading"
+                        :reserve-keyword="false" placeholder="搜索商城商品添加带货标签（选填，最多 3 个）"
+                        style="width: 100%" :multiple-limit="3">
+                        <el-option v-for="p in productOptions" :key="p.id" :label="p.name" :value="p.id">
+                            <span>{{ p.name }}</span>
+                            <span style="float:right;color:#f56c6c">¥{{ p.price }}</span>
+                        </el-option>
+                    </el-select>
+                    <div style="width:100%;color:#999;font-size:12px;line-height:1.6">
+                        添加后文章会展示商品卡片，读者点击可直接跳转到商品页购买
+                    </div>
                 </el-form-item>
                 <el-form-item label="文章内容">
                     <div class="editor">

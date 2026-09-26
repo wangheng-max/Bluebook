@@ -112,6 +112,19 @@ onMounted(() => {
                     <span class="author">{{ article.authorName }}</span>
                     <span class="time">{{ article.createTime }}</span>
                     <span class="view">👁 {{ article.viewCount || 0 }} 次浏览</span>
+                    <!-- 作者认证店铺：点击进店看全部商品 -->
+                    <el-button v-if="article.shopUserId" type="warning" size="small" round plain
+                        class="shop-entry" @click="router.push(`/mall/shop/${article.shopUserId}`)">
+                        🏪 {{ article.shopName }} · 进店逛逛
+                    </el-button>
+                </div>
+
+                <!-- 标签：点击跳社区标签检索 -->
+                <div class="detail-tags" v-if="article.tags && article.tags.length">
+                    <el-tag v-for="t in article.tags" :key="t" effect="plain" class="detail-tag"
+                        @click="router.push({ path: '/community/feed', query: { tag: t } })">
+                        # {{ t }}
+                    </el-tag>
                 </div>
 
                 <!-- 封面 -->
@@ -119,6 +132,25 @@ onMounted(() => {
 
                 <!-- 正文（富文本内容） -->
                 <div class="detail-content" v-html="article.content"></div>
+
+                <!-- 带货商品卡：点击跳商品详情页 -->
+                <div class="product-list" v-if="article.products && article.products.length">
+                    <h3 class="section-title">🛍 文章提及的好物</h3>
+                    <div class="product-card" v-for="p in article.products" :key="p.id"
+                        @click="p.status === 1 && router.push(`/mall/product/${p.id}`)">
+                        <img :src="p.coverImg" class="product-img" />
+                        <div class="product-info">
+                            <div class="product-name">{{ p.name }}</div>
+                            <div class="product-sub">
+                                <span class="product-price">¥{{ p.price }}</span>
+                                <el-tag v-if="p.status !== 1" size="small" type="info">已下架</el-tag>
+                            </div>
+                        </div>
+                        <el-button type="danger" size="small" round :disabled="p.status !== 1">
+                            去看看
+                        </el-button>
+                    </div>
+                </div>
 
                 <!-- 互动栏 -->
                 <div class="action-bar">
@@ -190,8 +222,58 @@ onMounted(() => {
         gap: 10px;
         margin-bottom: 20px;
         color: #666;
+        flex-wrap: wrap;
         .author { font-weight: 600; }
         .time, .view { font-size: 13px; color: #999; }
+        .shop-entry { margin-left: auto; }
+    }
+    .detail-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+        .detail-tag { cursor: pointer; }
+    }
+    .product-list {
+        margin-top: 24px;
+        padding: 16px;
+        background: #fafbfc;
+        border-radius: 10px;
+        .section-title {
+            font-size: 15px;
+            margin: 0 0 12px;
+        }
+        .product-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+            &:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+            .product-img {
+                width: 64px;
+                height: 64px;
+                object-fit: cover;
+                border-radius: 6px;
+                background: #f5f7fa;
+            }
+            .product-info {
+                flex: 1;
+                min-width: 0;
+                .product-name {
+                    font-size: 14px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    margin-bottom: 6px;
+                }
+                .product-price { color: #f56c6c; font-weight: bold; margin-right: 8px; }
+            }
+        }
     }
     .detail-cover {
         width: 100%;

@@ -29,6 +29,7 @@ import MyCouponVue from '@/views/mall/MyCoupon.vue'
 import OrderConfirmVue from '@/views/mall/OrderConfirm.vue'
 import MyOrderVue from '@/views/mall/MyOrder.vue'
 import MyGroupBuyVue from '@/views/mall/MyGroupBuy.vue'
+import ShopVue from '@/views/mall/Shop.vue'
 import UserAddressVue from '@/views/user/UserAddress.vue'
 
 // 商城团购模块（商家侧）
@@ -62,6 +63,7 @@ const routes = [
             // 商城（用户侧）
             { path: '/mall', component: MallHomeVue },
             { path: '/mall/product/:id', component: ProductDetailVue },
+            { path: '/mall/shop/:merchantUserId', component: ShopVue },
             { path: '/mall/group-buy', component: GroupBuyListVue },
             { path: '/mall/group-buy/:id', component: GroupBuyDetailVue },
             { path: '/mall/coupon', component: CouponCenterVue },

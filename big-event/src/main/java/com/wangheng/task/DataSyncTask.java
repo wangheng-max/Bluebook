@@ -1,8 +1,18 @@
 package com.wangheng.task;
 
-import com.wangheng.mapper.ArticleMapper;
-import com.wangheng.mapper.InteractionMapper;
-import com.wangheng.pojo.Article;
+import com.wangheng.article.mapper.ArticleMapper;
+import com.wangheng.article.mapper.InteractionMapper;
+import com.wangheng.article.pojo.Article;
+
+
+
+
+
+
+
+
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;

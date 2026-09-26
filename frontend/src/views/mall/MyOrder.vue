@@ -12,6 +12,7 @@ import {
     money, formatTime, ORDER_STATUS_MAP, ORDER_STATUS_TAG, ORDER_TYPE_MAP,
     REFUND_STATUS_MAP, REFUND_STATUS_TAG, textOf
 } from '@/utils/mall.js'
+import { rateMerchantService, ratingExistsService } from '@/api/shop.js'
 
 const activeTab = ref('orders')
 
@@ -87,6 +88,52 @@ const cancel = (order) => {
             actingId.value = null
         }
     }).catch(() => { })
+}
+
+// ---------- 商家评价（订单已发货/完成后，一单一评） ----------
+const ratingVisible = ref(false)
+const ratingOrder = ref(null)
+const ratingScore = ref(5)
+const ratingContent = ref('')
+const ratingSubmitting = ref(false)
+const ratedOrderIds = ref({}) // { [orderId]: true }，对象映射保证响应式
+
+const openRating = async (order) => {
+    // 先查是否已评价，避免重复提交
+    try {
+        const exists = await ratingExistsService(order.id)
+        if (exists.data) {
+            ratedOrderIds.value[order.id] = true
+            ElMessage.info('该订单已评价过，感谢您的反馈')
+            return
+        }
+    } catch (e) {
+        // 查询失败不阻塞，提交时后端还会兜底校验
+    }
+    ratingOrder.value = order
+    ratingScore.value = 5
+    ratingContent.value = ''
+    ratingVisible.value = true
+}
+
+const submitRating = async () => {
+    if (!ratingScore.value) {
+        ElMessage.warning('请先打分')
+        return
+    }
+    ratingSubmitting.value = true
+    try {
+        await rateMerchantService({
+            orderId: ratingOrder.value.id,
+            score: ratingScore.value,
+            content: ratingContent.value.trim() || null
+        })
+        ElMessage.success('评价成功，感谢您的反馈')
+        ratedOrderIds.value[ratingOrder.value.id] = true
+        ratingVisible.value = false
+    } finally {
+        ratingSubmitting.value = false
+    }
 }
 
 const applyRefund = (order) => {
@@ -230,8 +277,14 @@ loadOrders()
                                 <template v-else-if="order.status === 5">
                                     <el-button size="small" text type="info">退款处理中，请等待商家审核</el-button>
                                 </template>
-                                <template v-else-if="order.status === 2">
-                                    <el-button size="small" text type="info">商家已发货，等待收货</el-button>
+                                <template v-else-if="order.status === 2 || order.status === 3">
+                                    <el-button type="warning" size="small" plain
+                                        @click="openRating(order)">
+                                        {{ ratedOrderIds[order.id] ? '已评价' : '评价商家' }}
+                                    </el-button>
+                                    <el-button v-if="order.status === 2" size="small" text type="info">
+                                        商家已发货，等待收货
+                                    </el-button>
                                 </template>
                             </div>
                         </div>
@@ -296,6 +349,24 @@ loadOrders()
                     style="margin-top: 20px; justify-content: center" />
             </el-tab-pane>
         </el-tabs>
+
+        <!-- 商家评价弹窗 -->
+        <el-dialog v-model="ratingVisible" title="评价商家" width="440px">
+            <div class="rating-dialog" v-if="ratingOrder">
+                <div class="rating-target">订单号：{{ ratingOrder.orderNo }}</div>
+                <div class="rating-stars">
+                    <span class="label">店铺评分</span>
+                    <el-rate v-model="ratingScore" allow-half :colors="['#ff9900', '#ff9900', '#ff9900']"
+                        show-text :texts="['很差', '较差', '一般', '满意', '非常满意']" />
+                </div>
+                <el-input v-model="ratingContent" type="textarea" :rows="3" maxlength="200" show-word-limit
+                    placeholder="说说你的购物体验（选填）：商品质量、发货速度、服务态度…" />
+            </div>
+            <template #footer>
+                <el-button @click="ratingVisible = false">取消</el-button>
+                <el-button type="primary" :loading="ratingSubmitting" @click="submitRating">提交评价</el-button>
+            </template>
+        </el-dialog>
     </el-card>
 </template>
 
@@ -303,6 +374,26 @@ loadOrders()
 .page-container {
     min-height: 100%;
     box-sizing: border-box;
+
+    .rating-dialog {
+        .rating-target {
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .rating-stars {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+
+            .label {
+                font-size: 14px;
+                color: #666;
+            }
+        }
+    }
 
     .header {
         display: flex;

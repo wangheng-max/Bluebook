@@ -14,3 +14,8 @@ export const communityArticlesService = (params) => {
 export const communityArticleDetailService = (articleId) => {
     return request.get(`/community/article/${articleId}`)
 }
+
+// 热门标签 Top N（发布表单联想）
+export const communityHotTagsService = (limit = 10) => {
+    return request.get('/community/hot-tags', { params: { limit } })
+}

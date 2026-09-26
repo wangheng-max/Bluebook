@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangheng.coupon.mapper.UserCouponMapper">
+
+    <!-- 我的优惠券（联券类型摘要），状态动态筛选 -->
+    <select id="listWithType" resultType="com.wangheng.coupon.pojo.UserCouponVO">
+        select uc.id,
+               uc.coupon_type_id,
+               ct.name          as type_name,
+               ct.min_spend,
+               ct.discount_amount,
+               ct.discount_rate,
+               ct.valid_days,
+               uc.start_time,
+               uc.end_time,
+               uc.status
+        from user_coupon uc
+        join coupon_type ct on uc.coupon_type_id = ct.id
+        <where>
+            uc.user_id = #{userId}
+            <if test="status != null">and uc.status = #{status}</if>
+        </where>
+        order by uc.id desc
+    </select>
+
+</mapper>

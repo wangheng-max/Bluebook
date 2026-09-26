@@ -1,6 +1,12 @@
 package com.wangheng.exception;
 
-import com.wangheng.pojo.Result;
+import com.wangheng.common.Result;
+
+
+
+
+
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;

@@ -1,8 +1,20 @@
 package com.wangheng.task;
 
-import com.wangheng.mapper.CouponStockMapper;
-import com.wangheng.pojo.CouponStock;
-import com.wangheng.service.impl.CouponGrabServiceImpl;
+import com.wangheng.coupon.mapper.CouponStockMapper;
+import com.wangheng.coupon.pojo.CouponStock;
+import com.wangheng.coupon.service.impl.CouponGrabServiceImpl;
+
+
+
+
+
+
+
+
+
+
+
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
