@@ -18,7 +18,11 @@ v2.0 采用「飞书蓝」设计语言：浅色侧边栏、玻璃拟态登录卡
 
 | 登录 / 注册 | 社区首页 |
 |---|---|
-| ![登录页](readme-images/login.png) | ![社区首页](readme-images/community-feed.png) |
+| [登录页]
+![alt text](image.png)
+| ![社区首页]
+ |
+ ![alt text](image-1.png)
 
 ---
 
