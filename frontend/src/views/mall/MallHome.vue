@@ -153,7 +153,9 @@ loadProducts()
         <!-- 商品网格 -->
         <div class="product-grid" v-loading="loading" v-if="products.length > 0">
             <el-card v-for="p in products" :key="p.id" class="product-card" shadow="hover" @click="toDetail(p.id)">
-                <img :src="p.coverImg" class="cover-img" />
+                <div class="cover-wrapper">
+                    <img :src="p.coverImg" class="cover-img" />
+                </div>
                 <div class="card-body">
                     <h3 class="product-name">{{ p.name }}</h3>
                     <div class="price-row">
@@ -192,13 +194,15 @@ loadProducts()
         gap: 12px;
 
         span:first-child {
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 22px;
+            font-weight: 800;
+            color: #1f2329;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
-            color: #999;
-            font-size: 14px;
+            color: #8f959e;
+            font-size: 13.5px;
         }
     }
 
@@ -276,25 +280,38 @@ loadProducts()
 
         .product-card {
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-out;
 
             &:hover {
-                transform: translateY(-2px);
+                transform: translateY(-4px);
+                box-shadow: 0 6px 18px 0 rgba(31, 35, 41, 0.08);
             }
 
-            .cover-img {
-                width: 100%;
-                height: 180px;
-                object-fit: cover;
-                border-radius: 4px;
-                background-color: #f5f7fa;
+            :deep(.el-card__body) { padding: 0; }
+
+            .cover-wrapper {
+                height: 190px;
+                overflow: hidden;
+                background-color: #f5f6f7;
+
+                .cover-img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                    transition: transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+                }
             }
+
+            &:hover .cover-wrapper .cover-img { transform: scale(1.05); }
 
             .card-body {
-                padding-top: 8px;
+                padding: 12px 14px 14px;
 
                 .product-name {
-                    font-size: 15px;
+                    font-size: 14.5px;
+                    font-weight: 600;
+                    color: #1f2329;
                     margin: 0 0 8px;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -307,13 +324,14 @@ loadProducts()
                     gap: 8px;
 
                     .price {
-                        color: #f56c6c;
+                        color: #ff3b30;
                         font-size: 18px;
                         font-weight: bold;
+                        letter-spacing: -0.3px;
                     }
 
                     .market-price {
-                        color: #bbb;
+                        color: #bbbfc4;
                         font-size: 12px;
                         text-decoration: line-through;
                     }
@@ -323,11 +341,11 @@ loadProducts()
                     display: flex;
                     justify-content: space-between;
                     font-size: 12px;
-                    color: #999;
+                    color: #8f959e;
                     margin-top: 8px;
 
                     .out-of-stock {
-                        color: #f56c6c;
+                        color: #ff3b30;
                     }
                 }
             }

@@ -223,7 +223,9 @@ loadCategories()
                 shadow="hover"
                 @click="viewDetail(article.noteId)"
             >
-                <img v-if="article.coverImage" :src="article.coverImage" class="cover-img" />
+                <div v-if="article.coverImage" class="cover-wrapper">
+                    <img :src="article.coverImage" class="cover-img" />
+                </div>
                 <div class="card-content">
                     <h3 class="article-title">{{ article.title }}</h3>
                     <p class="article-summary">{{ article.summary }}</p>
@@ -304,14 +306,16 @@ function formatDate(dateStr) {
 </script>
 
 <style lang="scss" scoped>
+@use '../../assets/styles/tokens.scss' as *;
+
 .community-feed {
     min-height: 100%;
     .feed-header {
         display: flex;
         align-items: baseline;
         gap: 12px;
-        .title { font-size: 18px; font-weight: bold; }
-        .subtitle { color: #999; font-size: 14px; }
+        .title { font-size: 22px; font-weight: 800; color: $text-primary; letter-spacing: -0.5px; }
+        .subtitle { color: $text-secondary; font-size: 13.5px; }
     }
     .search-bar {
         max-width: 600px;
@@ -327,6 +331,9 @@ function formatDate(dateStr) {
         margin-bottom: 10px;
         .feed-tag {
             cursor: pointer;
+            transition: $transition-base;
+
+            &:hover { color: $color-primary; border-color: rgba(51, 112, 255, 0.5); background: $color-primary-light; }
         }
     }
     .product-chip {
@@ -335,23 +342,26 @@ function formatDate(dateStr) {
         gap: 8px;
         padding: 8px 10px;
         margin-bottom: 12px;
-        background: #fff7f0;
-        border: 1px solid #ffe3c9;
-        border-radius: 8px;
+        background: $color-primary-light;
+        border: 1px solid #d6e2ff;
+        border-radius: $radius-base;
         cursor: pointer;
-        transition: box-shadow 0.2s;
-        &:hover { box-shadow: 0 2px 8px rgba(230, 140, 60, 0.15); }
+        transition: box-shadow 0.2s, transform 0.2s;
+        &:hover {
+            box-shadow: $shadow-card;
+            transform: translateY(-1px);
+        }
         .chip-icon { font-size: 16px; }
         .chip-name {
             flex: 1;
             font-size: 13px;
-            color: #666;
+            color: $text-regular;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .chip-price { color: #f56c6c; font-weight: bold; font-size: 13px; }
-        .chip-go { color: #e68c3c; font-size: 12px; white-space: nowrap; }
+        .chip-price { color: $color-danger; font-weight: bold; font-size: 13px; }
+        .chip-go { color: $color-primary; font-size: 12px; white-space: nowrap; }
     }
     .category-nav {
         display: flex;
@@ -367,31 +377,52 @@ function formatDate(dateStr) {
     .article-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 16px;
+        gap: 18px;
     }
     .article-card {
         cursor: pointer;
-        transition: transform 0.2s;
-        &:hover { transform: translateY(-2px); }
-        .cover-img {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            border-radius: 4px;
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-out;
+
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: $shadow-card-hover;
         }
+
+        :deep(.el-card__body) { padding: 0; }
+
+        .cover-wrapper {
+            height: 172px;
+            overflow: hidden;
+            background: #f5f6f7;
+
+            .cover-img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                transition: transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+            }
+        }
+
+        &:hover .cover-wrapper .cover-img { transform: scale(1.05); }
+
         .card-content {
-            padding: 8px 0;
+            padding: 14px 16px 16px;
+
             .article-title {
-                font-size: 16px;
+                font-size: 15.5px;
+                font-weight: 700;
+                color: $text-primary;
                 margin: 0 0 8px;
+                letter-spacing: -0.2px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
             .article-summary {
-                color: #666;
+                color: $text-regular;
                 font-size: 13px;
-                line-height: 1.5;
+                line-height: 1.6;
                 display: -webkit-box;
                 -webkit-line-clamp: 3;
                 -webkit-box-orient: vertical;
@@ -406,21 +437,30 @@ function formatDate(dateStr) {
                     display: flex;
                     align-items: center;
                     gap: 6px;
-                    .author-name { font-size: 12px; color: #666; }
+                    min-width: 0;
+                    .author-name {
+                        font-size: 12px;
+                        color: $text-regular;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
                 }
                 .stats {
                     display: flex;
                     gap: 8px;
                     font-size: 12px;
-                    color: #999;
-                    .time { color: #bbb; }
+                    color: $text-secondary;
+                    flex-shrink: 0;
+                    .time { color: $text-placeholder; }
 
                     // 卡片点赞入口：与详情页同一套接口
                     .like-chip {
                         cursor: pointer;
                         user-select: none;
+                        transition: $transition-fast;
 
-                        &:hover { color: #f56c6c; }
+                        &:hover { color: #f56c6c; transform: scale(1.08); }
                         &.liked { color: #f56c6c; }
                     }
                 }

@@ -1,20 +1,22 @@
+@use './styles/element.scss';
+
 body {
-  margin: 0;
-  background-color: #f5f5f5;
+    margin: 0;
+    background-color: #fafbfc;
 }
 
-/* fade-slide */
+/* fade-slide 页面切换 */
 .fade-slide-leave-active,
 .fade-slide-enter-active {
-  transition: all 0.3s;
+    transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .fade-slide-enter-from {
-  transform: translateX(-30px);
-  opacity: 0;
+    transform: translateY(12px);
+    opacity: 0;
 }
 
 .fade-slide-leave-to {
-  transform: translateX(30px);
-  opacity: 0;
+    transform: translateY(-8px);
+    opacity: 0;
 }
