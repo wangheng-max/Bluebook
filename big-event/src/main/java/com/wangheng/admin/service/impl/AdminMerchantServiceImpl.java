@@ -1,49 +1,26 @@
 package com.wangheng.admin.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.wangheng.admin.pojo.AuditRequestDTO;
 import com.wangheng.admin.service.AdminMerchantService;
+import com.wangheng.auth.MerchantPermissionChecker;
 import com.wangheng.common.PageBean;
+import com.wangheng.exception.MerchantAuthException;
 import com.wangheng.merchant.mapper.MerchantInfoMapper;
 import com.wangheng.merchant.pojo.MerchantInfo;
 import com.wangheng.user.mapper.UserRoleMapper;
 import com.wangheng.user.pojo.UserRole;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.wangheng.auth.MerchantPermissionChecker;
-import com.wangheng.exception.MerchantAuthException;
-
-
-
-
-
-
-
 import com.wangheng.websocket.ChatWebSocketHandler;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 /**
  * 管理员商家审核服务实现（v1.1 商家认证机制）。

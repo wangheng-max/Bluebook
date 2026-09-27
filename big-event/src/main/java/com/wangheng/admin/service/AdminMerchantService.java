@@ -5,17 +5,6 @@ import com.wangheng.common.PageBean;
 import com.wangheng.merchant.pojo.MerchantInfo;
 
 
-
-
-
-
-
-
-
-
-
-
-
 /**
  * 管理员商家审核服务（v1.1 商家认证机制）
  */

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+
 /**
  * 商家认证申请参数（POST /merchant/apply、/merchant/apply/re-submit）
  */

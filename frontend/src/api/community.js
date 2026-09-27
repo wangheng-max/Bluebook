@@ -19,3 +19,8 @@ export const communityArticleDetailService = (articleId) => {
 export const communityHotTagsService = (limit = 10) => {
     return request.get('/community/hot-tags', { params: { limit } })
 }
+
+// 某作者的已发布文章（博主主页作品列表，公开）
+export const communityUserArticlesService = (userId, params) => {
+    return request.get(`/community/user/${userId}/articles`, { params })
+}

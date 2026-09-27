@@ -1,24 +1,20 @@
 package com.wangheng.user.controller;
 
+import com.wangheng.article.mapper.ArticleMapper;
 import com.wangheng.common.Result;
+import com.wangheng.follow.mapper.FollowMapper;
+import com.wangheng.merchant.mapper.MerchantInfoMapper;
+import com.wangheng.merchant.pojo.MerchantInfo;
+import com.wangheng.user.pojo.HomepageVO;
 import com.wangheng.user.pojo.User;
 import com.wangheng.user.service.UserService;
-
-
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.JwtUtil;
 import com.wangheng.utils.Md5Util;
 import com.wangheng.utils.ThreadLocalUtil;
 import jakarta.validation.constraints.Pattern;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -26,10 +22,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
@@ -40,6 +32,12 @@ public class UserController {
     private UserService userService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private ArticleMapper articleMapper;
+    @Autowired
+    private FollowMapper followMapper;
+    @Autowired
+    private MerchantInfoMapper merchantInfoMapper;
 
     @PostMapping("/register")
     public Result register(@Pattern(regexp = "^\\S{5,16}$", message = "用户名需为5-16位非空字符") String username,
@@ -141,6 +139,59 @@ public class UserController {
         //删除redis中对应的token
         ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
         operations.getOperations().delete(token);
+        return Result.success();
+    }
+
+    /**
+     * 用户/博主公开主页（白名单匿名可读，带有效 token 时返回关注状态）：
+     * 作品数、粉丝数、关注数、自我介绍、认证店铺入口；本人访问 isSelf=true
+     */
+    @GetMapping("/homepage/{userId}")
+    public Result<HomepageVO> homepage(@PathVariable Integer userId) {
+        User user = userMapperFindById(userId);
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+        HomepageVO vo = new HomepageVO();
+        vo.setUserId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setNickname(user.getNickname());
+        vo.setAvatar(user.getUserPic());
+        vo.setBio(user.getBio());
+        vo.setArticleCount(articleMapper.countPublishedByUser(userId));
+        vo.setFollowerCount(followMapper.countFollowers(1, userId));
+        vo.setFollowingCount(followMapper.countFollowing(userId, 1));
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        Integer me = claims == null ? null : (Integer) claims.get("id");
+        vo.setFollowed(me != null && followMapper.exists(me, userId, 1) > 0);
+        vo.setIsSelf(userId.equals(me));
+        MerchantInfo shop = merchantInfoMapper.findByUserId(userId);
+        if (shop != null && Integer.valueOf(1).equals(shop.getMerchantStatus())) {
+            vo.setShopUserId(shop.getUserId());
+            vo.setShopName(shop.getShopName());
+            vo.setShopLogo(shop.getShopLogo());
+        }
+        return Result.success(vo);
+    }
+
+    /** 主页查询内部用：按 ID 查用户（避免与用户名查询混淆） */
+    private User userMapperFindById(Integer userId) {
+        return userService.findById(userId);
+    }
+
+    /** 更新自我介绍（个人主页） */
+    @PatchMapping("/bio")
+    public Result updateBio(@RequestBody Map<String, String> params) {
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        Integer me = claims == null ? null : (Integer) claims.get("id");
+        if (me == null) {
+            return Result.error("请先登录");
+        }
+        String bio = params.get("bio");
+        if (bio != null && bio.length() > 200) {
+            return Result.error("自我介绍不能超过 200 字");
+        }
+        userService.updateBio(me, bio == null ? null : bio.trim());
         return Result.success();
     }
 }

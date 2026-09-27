@@ -1,10 +1,11 @@
 package com.wangheng.groupbuy.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Data;
+
+
 
 /**
  * 我的团购进度返回对象（GET /group-buy/my-progress）

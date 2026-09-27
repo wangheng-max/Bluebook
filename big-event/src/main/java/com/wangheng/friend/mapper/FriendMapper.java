@@ -3,18 +3,8 @@ package com.wangheng.friend.mapper;
 import com.wangheng.friend.pojo.FriendRelation;
 import com.wangheng.friend.pojo.FriendRequestVO;
 import com.wangheng.friend.pojo.FriendVO;
-
-
-
-
-
-
-
-
-
-import org.apache.ibatis.annotations.*;
-
 import java.util.List;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface FriendMapper {

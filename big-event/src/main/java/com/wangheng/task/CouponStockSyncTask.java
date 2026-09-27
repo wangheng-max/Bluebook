@@ -3,25 +3,26 @@ package com.wangheng.task;
 import com.wangheng.coupon.mapper.CouponStockMapper;
 import com.wangheng.coupon.pojo.CouponStock;
 import com.wangheng.coupon.service.impl.CouponGrabServiceImpl;
-
-
-
-
-
-
-
-
-
-
-
-
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * 库存对账（设计文档《数据库库存同步（定时对账）》）：每 5 分钟将数据库库存与 Redis 对齐。

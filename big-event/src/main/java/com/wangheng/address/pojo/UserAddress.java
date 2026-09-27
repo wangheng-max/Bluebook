@@ -1,11 +1,11 @@
 package com.wangheng.address.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 
 /**
  * 收货地址实体（表 user_address）

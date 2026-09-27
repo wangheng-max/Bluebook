@@ -1,9 +1,10 @@
 package com.wangheng.common;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+
 
 //统一响应结果
 @NoArgsConstructor

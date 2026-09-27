@@ -43,3 +43,13 @@ export const userAvatarUpdateService = (avatarUrl)=>{
       return request.patch('/user/updatePwd', passwordData)
   }
 
+
+// 用户/博主公开主页（作品数/粉丝数/关注数/自我介绍/店铺入口）
+export const userHomepageService = (userId) => {
+    return request.get(`/user/homepage/${userId}`)
+}
+
+// 更新自我介绍（个人主页）
+export const userUpdateBioService = (data) => {
+    return request.patch('/user/bio', data)
+}

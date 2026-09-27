@@ -1,8 +1,9 @@
 package com.wangheng.product.pojo;
 
+import java.util.List;
 import lombok.Data;
 
-import java.util.List;
+
 
 /**
  * 商品分类树节点（GET /product/category/tree）

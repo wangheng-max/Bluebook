@@ -18,6 +18,7 @@ import com.wangheng.coupon.pojo.CouponTypeDTO;
 
 
 
+
 /**
  * 商家优惠券管理服务（仅认证商家，@RequireMerchant + 数据隔离）。
  */

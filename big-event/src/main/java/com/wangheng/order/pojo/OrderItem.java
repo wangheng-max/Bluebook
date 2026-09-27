@@ -1,10 +1,11 @@
 package com.wangheng.order.pojo;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+
 
 /**
  * 订单明细实体（表 order_item）。

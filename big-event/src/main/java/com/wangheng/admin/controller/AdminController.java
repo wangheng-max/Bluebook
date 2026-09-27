@@ -4,32 +4,12 @@ import com.wangheng.admin.pojo.AdminStatusVO;
 import com.wangheng.common.Result;
 import com.wangheng.product.controller.ProductController;
 import com.wangheng.user.mapper.UserRoleMapper;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
-
-
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
-
 /**
  * 平台管理通用接口。
  * 仅返回调用者自身的角色判断（是否管理员），供前端决定"平台管理"菜单可见性；

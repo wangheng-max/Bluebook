@@ -9,38 +9,41 @@ import com.wangheng.product.pojo.Product;
 import com.wangheng.product.pojo.ProductBriefVO;
 import com.wangheng.user.mapper.UserMapper;
 import com.wangheng.user.pojo.User;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Article → NoteSearchVO 共享转换器。
@@ -58,10 +61,14 @@ public class NoteVOConverter {
     @Autowired
     private MerchantInfoMapper merchantInfoMapper;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     public NoteSearchVO convert(Article article) {
         NoteSearchVO vo = new NoteSearchVO();
         vo.setNoteId(article.getId());
         vo.setTitle(article.getTitle());
+        vo.setLiked(isLikedByCurrentUser(article.getId()));
 
         // 生成摘要：去除HTML/纯文本后截取前150字
         String content = article.getContent();
@@ -113,6 +120,17 @@ public class NoteVOConverter {
             }
         }
         return vo;
+    }
+
+    /** 当前登录用户是否已赞该文章；匿名/无登录态返回 false */
+    private boolean isLikedByCurrentUser(Integer articleId) {
+        Map<String, Object> claims = com.wangheng.utils.ThreadLocalUtil.get();
+        if (claims == null || claims.get("id") == null) {
+            return false;
+        }
+        Boolean member = stringRedisTemplate.opsForSet()
+                .isMember(InteractionRedisKeys.likeKey(articleId), String.valueOf(claims.get("id")));
+        return Boolean.TRUE.equals(member);
     }
 
     /** 逗号分隔字符串 → 去空白去空项的列表 */

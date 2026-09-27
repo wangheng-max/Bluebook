@@ -1,10 +1,11 @@
 package com.wangheng.product.pojo;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+
 
 /**
  * 带货商品简要信息（文章卡片/详情展示，点击跳商品页）。

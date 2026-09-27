@@ -1,24 +1,15 @@
 package com.wangheng.search.service;
 
-import com.wangheng.article.pojo.NoteSearchVO;
-import com.wangheng.common.PageBean;
-
-
-
-
-
-
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-
+import com.wangheng.article.pojo.NoteSearchVO;
+import com.wangheng.common.PageBean;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 公开笔记搜索结果的 Redis 缓存。

@@ -2,6 +2,7 @@ package com.wangheng.config;
 
 import com.wangheng.utils.JwtUtil;
 import com.wangheng.websocket.ChatWebSocketHandler;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
@@ -12,7 +13,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import java.util.Map;
+
 
 /**
  * WebSocket 配置：注册 /ws/chat，握手时从 query 参数 token 解析 userId（复用 JWT 登录态）。

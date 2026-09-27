@@ -3,25 +3,26 @@ package com.wangheng.task;
 import com.wangheng.order.mapper.OrderMapper;
 import com.wangheng.order.pojo.Order;
 import com.wangheng.order.service.OrderService;
-
-
-
-
-
-
-
-
-
-
-
-
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.List;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * 订单超时自动取消（设计文档《定时任务设计》）：每分钟扫描待支付超 30 分钟的订单。

@@ -1,5 +1,9 @@
 package com.wangheng.coupon.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.wangheng.common.PageBean;
 import com.wangheng.coupon.mapper.CouponStockMapper;
 import com.wangheng.coupon.mapper.CouponTypeMapper;
@@ -12,51 +16,48 @@ import com.wangheng.coupon.pojo.UserCouponVO;
 import com.wangheng.coupon.service.CouponGrabService;
 import com.wangheng.coupon.service.CouponService;
 import com.wangheng.coupon.util.CouponStockStatusHelper;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.wangheng.exception.MerchantAuthException;
-
-
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * 优惠券服务实现（用户视角）。

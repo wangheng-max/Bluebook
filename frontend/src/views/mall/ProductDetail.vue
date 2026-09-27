@@ -5,6 +5,7 @@ import { ArrowLeft, ShoppingCart } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { productDetailService, productSkuListService } from '@/api/product.js'
 import { shopInfoService } from '@/api/shop.js'
+import { commentStatsService } from '@/api/comment.js'
 import { money } from '@/utils/mall.js'
 import CommentSection from '@/components/CommentSection.vue'
 
@@ -15,6 +16,7 @@ const productId = Number(route.params.id)
 const product = ref({})
 const skus = ref([])
 const shop = ref(null) // 商品所属店铺（认证商家才有）
+const productStats = ref(null) // 商品评分（来自商品评论打分）
 const selectedSkuId = ref(null)
 const quantity = ref(1)
 const loading = ref(false)
@@ -76,6 +78,13 @@ const loadDetail = async () => {
         skus.value = []
     } finally {
         loading.value = false
+    }
+    // 商品评分统计（来自商品评论区打分）：失败不影响商品主体展示
+    try {
+        const statsResult = await commentStatsService({ targetType: 'product', targetId: productId })
+        productStats.value = statsResult.data || null
+    } catch (e) {
+        productStats.value = null
     }
     // 店铺信息（商家认证店铺才有）：失败不影响商品主体展示
     try {
@@ -153,6 +162,9 @@ loadDetail()
                     <span>销量 {{ product.salesCount || 0 }}</span>
                     <span>浏览 {{ product.viewCount || 0 }}</span>
                     <span>库存 {{ availableStock }}</span>
+                    <span v-if="productStats?.avgScore" class="p-score">
+                        商品评分 {{ productStats.avgScore }} 分（{{ productStats.scoreCount }} 人评分）
+                    </span>
                 </div>
 
                 <!-- 店铺卡片：评分 + 进店看全部商品 -->

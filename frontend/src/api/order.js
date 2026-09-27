@@ -65,3 +65,8 @@ export const merchantRefundListService = (params) => {
 export const merchantRefundAuditService = (id, approved, remark) => {
     return request.post(`/merchant/refund/${id}/audit`, { approved, remark })
 }
+
+// 我购买某商品的订单明细（商品评论晒单用，新的在前）
+export const myPurchasedService = (productId) => {
+    return request.get('/order/purchased', { params: { productId } })
+}

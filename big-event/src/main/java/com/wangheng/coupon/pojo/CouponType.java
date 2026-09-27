@@ -1,12 +1,13 @@
 package com.wangheng.coupon.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+
 
 /**
  * 优惠券类型实体（表 coupon_type，商家创建）。

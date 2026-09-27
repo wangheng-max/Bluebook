@@ -1,12 +1,7 @@
 package com.wangheng.product.mapper;
 
 import com.wangheng.product.pojo.ProductSku;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,7 +9,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import java.util.List;
 
 /**
  * 商品 SKU 表 Mapper

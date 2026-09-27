@@ -7,28 +7,9 @@ import com.wangheng.merchant.pojo.MerchantInfo;
 import com.wangheng.merchant.pojo.RatingCreateDTO;
 import com.wangheng.order.mapper.OrderMapper;
 import com.wangheng.order.pojo.Order;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
 import jakarta.validation.Valid;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.validation.annotation.Validated;
@@ -39,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 
 /**
  * 商家评分接口（登录用户，订单维度一单一评）。

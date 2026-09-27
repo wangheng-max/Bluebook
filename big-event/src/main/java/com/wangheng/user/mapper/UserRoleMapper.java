@@ -1,12 +1,6 @@
 package com.wangheng.user.mapper;
 
 import com.wangheng.user.pojo.UserRole;
-
-
-
-
-
-
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;

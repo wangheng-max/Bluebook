@@ -2,6 +2,7 @@ package com.wangheng.coupon.pojo;
 
 import lombok.Data;
 
+
 /**
  * 商家优惠券统计（GET /merchant/coupon/statistics）
  */

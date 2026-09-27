@@ -1,4 +1,6 @@
 <script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
 import { ref, onMounted } from 'vue'
 import { friendListService, friendDeleteService } from '@/api/friend.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -72,11 +74,14 @@ onMounted(fetchFriends)
 
         <div class="friend-grid" v-if="friends.length > 0">
             <div v-for="f in friends" :key="f.friendId" class="friend-card">
-                <el-avatar :size="60" :src="f.avatar">{{ f.nickname?.charAt(0) }}</el-avatar>
-                <div class="friend-info">
-                    <div class="friend-name">{{ f.nickname }}</div>
-                    <div class="friend-username">@{{ f.username }}</div>
-                    <div class="friend-notes">📒 {{ f.noteCount || 0 }} 篇笔记</div>
+                <div class="friend-main" @click="router.push(`/user/homepage/${f.friendId}`)"
+                    title="查看 TA 的个人主页">
+                    <el-avatar :size="60" :src="f.avatar">{{ f.nickname?.charAt(0) }}</el-avatar>
+                    <div class="friend-info">
+                        <div class="friend-name">{{ f.nickname }}</div>
+                        <div class="friend-username">@{{ f.username }}</div>
+                        <div class="friend-notes">📒 {{ f.noteCount || 0 }} 篇笔记 · 点击查看主页</div>
+                    </div>
                 </div>
                 <el-button type="primary" size="small" plain @click="openChat(f)">
                     <el-icon><ChatDotRound /></el-icon> 聊天
@@ -128,6 +133,15 @@ onMounted(fetchFriends)
     border-radius: 8px;
     transition: box-shadow 0.2s;
     &:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .friend-main {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+        min-width: 0;
+        cursor: pointer;
+        &:hover .friend-name { color: var(--el-color-primary); }
+    }
     .friend-info {
         flex: 1;
         .friend-name { font-size: 15px; font-weight: 500; }

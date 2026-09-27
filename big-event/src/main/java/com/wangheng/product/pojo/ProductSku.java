@@ -1,10 +1,11 @@
 package com.wangheng.product.pojo;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+
 
 /**
  * 商品 SKU 实体（表 product_sku，支持规格与独立库存）。

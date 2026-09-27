@@ -1,5 +1,7 @@
 package com.wangheng.merchant.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.wangheng.common.PageBean;
 import com.wangheng.merchant.mapper.MerchantInfoMapper;
 import com.wangheng.merchant.mapper.MerchantRatingMapper;
@@ -9,36 +11,9 @@ import com.wangheng.merchant.pojo.ShopVO;
 import com.wangheng.merchant.service.ShopService;
 import com.wangheng.product.mapper.ProductMapper;
 import com.wangheng.product.pojo.Product;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-
-
-
-
-
-
-
-
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * 店铺主页服务实现（公开读接口，匿名可访问，见 LoginInterceptor 白名单）。
@@ -54,6 +29,9 @@ public class ShopServiceImpl implements ShopService {
 
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    private com.wangheng.follow.mapper.FollowMapper followMapper;
 
     @Override
     public ShopVO getShop(Integer merchantUserId) {
@@ -74,6 +52,7 @@ public class ShopServiceImpl implements ShopService {
         Double avg = merchantRatingMapper.avgScore(merchantUserId);
         vo.setAvgScore(avg == null ? null : Math.round(avg * 10) / 10.0);
         vo.setRatingCount(merchantRatingMapper.countByMerchant(merchantUserId));
+        vo.setFollowerCount(followMapper.countFollowers(2, merchantUserId));
         vo.setProductCount(productMapper.countShopApproved(merchantUserId));
         return vo;
     }

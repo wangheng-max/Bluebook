@@ -12,6 +12,7 @@ import com.wangheng.common.PageBean;
 
 
 
+
 public interface ArticleService {
     //新增文章
     void add(Article article);

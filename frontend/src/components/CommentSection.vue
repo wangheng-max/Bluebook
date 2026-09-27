@@ -8,20 +8,29 @@ import {
     commentRepliesService,
     commentLikeService,
     commentUnlikeService,
-    commentDeleteService
+    commentDeleteService,
+    commentStatsService
 } from '@/api/comment.js'
+import { myPurchasedService } from '@/api/order.js'
 import useUserInfoStore from '@/stores/userInfo.js'
+import { useTokenStore } from '@/stores/token.js'
 import { formatTimeShort } from '@/utils/mall.js'
+import { Plus, CircleCloseFilled } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 
-//通用评论区组件：文章/商品共用。props.targetType = 'article' | 'product'
+//通用评论区组件：文章/商品/商家评价共用。props.targetType = 'article' | 'product' | 'rating'
 const props = defineProps({
     targetType: { type: String, required: true },
-    targetId: { type: [Number, String], required: true }
+    targetId: { type: [Number, String], required: true },
+    //紧凑模式：嵌入店铺评价等场景下去掉卡片外框与留白
+    compact: { type: Boolean, default: false }
 })
+
+const emit = defineEmits(['count-change'])
 
 const router = useRouter()
 const userInfoStore = useUserInfoStore()
+const tokenStore = useTokenStore()
 
 const comments = ref([])
 const total = ref(0)
@@ -30,9 +39,61 @@ const pageSize = 10
 const sort = ref('time')//time-按时间 / likes-按点赞
 const loading = ref(false)
 
+//商品评分统计（仅商品模式请求）
+const stats = ref(null)
+
 //发布顶级评论
 const content = ref('')
 const submitting = ref(false)
+
+//商品评论扩展：评分 / 晒图 / 已购订单快照
+const isProduct = () => props.targetType === 'product'
+const score = ref(5)
+const commentImages = ref([])//图片 URL 列表，最多 4 张
+const purchasedOrders = ref([])//我买过该商品的订单明细
+const selectedOrderId = ref(null)//选中的晒单订单
+
+//上传评论图片（复用 /api/upload）
+const onImageUploadSuccess = (result) => {
+    if (result && result.code === 0) {
+        if (commentImages.value.length >= 4) {
+            ElMessage.warning('评论图片最多 4 张')
+            return
+        }
+        commentImages.value.push(result.data)
+    } else {
+        ElMessage.error((result && result.message) || '图片上传失败')
+    }
+}
+const removeCommentImage = (index) => commentImages.value.splice(index, 1)
+
+//加载我买过该商品的订单（晒单"自动带上买的东西"）
+const loadPurchased = async () => {
+    purchasedOrders.value = []
+    selectedOrderId.value = null
+    if (!isProduct() || !isLogin()) return
+    try {
+        const result = await myPurchasedService(props.targetId)
+        purchasedOrders.value = result.data || []
+        //默认自动带上最近一单
+        if (purchasedOrders.value.length > 0) {
+            selectedOrderId.value = purchasedOrders.value[0].orderId
+        }
+    } catch (e) {
+        purchasedOrders.value = []
+    }
+}
+
+const loadStats = async () => {
+    stats.value = null
+    if (!isProduct()) return
+    try {
+        const result = await commentStatsService({ targetType: props.targetType, targetId: props.targetId })
+        stats.value = result.data || null
+    } catch (e) {
+        stats.value = null
+    }
+}
 
 //回复状态：记录当前正在回复的评论ID与内容（根评论和回复共用一套）
 const replyActiveId = ref(null)
@@ -68,6 +129,7 @@ const loadComments = async () => {
         comments.value = result.data?.items || []
         total.value = Number(result.data?.total || 0)
         Object.keys(repliesState).forEach(k => delete repliesState[k])
+        emit('count-change', total.value)
     } finally {
         loading.value = false
     }
@@ -86,15 +148,27 @@ const submitComment = async () => {
     }
     submitting.value = true
     try {
-        await commentAddService({
+        const payload = {
             targetType: props.targetType,
             targetId: props.targetId,
             content: content.value.trim()
-        })
+        }
+        if (isProduct()) {
+            payload.score = score.value
+            if (commentImages.value.length) {
+                payload.images = commentImages.value
+            }
+            if (selectedOrderId.value) {
+                payload.orderId = selectedOrderId.value
+            }
+        }
+        await commentAddService(payload)
         ElMessage.success('评论发布成功')
         content.value = ''
+        commentImages.value = []
+        selectedOrderId.value = purchasedOrders.value[0]?.orderId || null
         pageNum.value = 1
-        await loadComments()
+        await Promise.all([loadComments(), loadStats()])
     } finally {
         submitting.value = false
     }
@@ -143,16 +217,26 @@ const submitReply = async (comment) => {
     }
 }
 
+//点赞：乐观更新 + 失败回滚，请求中的评论加锁防连点
+const likePendingIds = new Set()
 const toggleLike = async (comment) => {
     if (requireLogin()) return
-    if (comment.liked) {
-        const result = await commentUnlikeService(comment.id)
-        comment.liked = false
-        comment.likeCount = result.data
-    } else {
-        const result = await commentLikeService(comment.id)
-        comment.liked = true
-        comment.likeCount = result.data
+    if (likePendingIds.has(comment.id)) return
+    likePendingIds.add(comment.id)
+    const prevLiked = !!comment.liked
+    const prevCount = Number(comment.likeCount || 0)
+    comment.liked = !prevLiked
+    comment.likeCount = prevCount + (prevLiked ? -1 : 1)
+    try {
+        const result = prevLiked
+            ? await commentUnlikeService(comment.id)
+            : await commentLikeService(comment.id)
+        if (result.data != null) comment.likeCount = Number(result.data)
+    } catch (e) {
+        comment.liked = prevLiked
+        comment.likeCount = prevCount
+    } finally {
+        likePendingIds.delete(comment.id)
     }
 }
 
@@ -203,11 +287,13 @@ const fetchReplies = async (root, page, replace) => {
 watch(() => [props.targetType, props.targetId], () => {
     pageNum.value = 1
     loadComments()
+    loadStats()
+    loadPurchased()
 }, { immediate: true })
 </script>
 
 <template>
-    <el-card class="comment-section">
+    <el-card class="comment-section" :class="{ 'is-compact': compact }" :shadow="compact ? 'never' : 'always'">
         <template #header>
             <div class="section-header">
                 <span class="section-title">全部评论（{{ total }}）</span>
@@ -220,8 +306,44 @@ watch(() => [props.targetType, props.targetId], () => {
 
         <!-- 发布评论 -->
         <div class="publish-box" v-if="isLogin()">
+            <div class="product-score" v-if="isProduct()">
+                <span class="score-label">商品评分</span>
+                <el-rate v-model="score" :colors="['#ff9900', '#ff9900', '#ff9900']"
+                    show-text :texts="['很差', '较差', '一般', '满意', '非常满意']" />
+            </div>
             <el-input v-model="content" type="textarea" :rows="2" maxlength="1000" show-word-limit
-                resize="none" placeholder="友善发言，理性讨论…" />
+                resize="none" :placeholder="isProduct() ? '说说商品质量、使用体验…' : '友善发言，理性讨论…'" />
+
+            <!-- 晒图（商品评论） -->
+            <div class="image-upload" v-if="isProduct()">
+                <div class="image-list">
+                    <div class="image-item" v-for="(img, i) in commentImages" :key="img">
+                        <el-image :src="img" fit="cover" class="thumb"
+                            :preview-src-list="commentImages" :initial-index="i" />
+                        <el-icon class="img-remove" @click="removeCommentImage(i)">
+                            <CircleCloseFilled />
+                        </el-icon>
+                    </div>
+                    <el-upload v-if="commentImages.length < 4" :auto-upload="true" :show-file-list="false"
+                        action="/api/upload" name="file" accept="image/*"
+                        :headers="{ Authorization: tokenStore.token }"
+                        :on-success="onImageUploadSuccess">
+                        <el-icon class="img-add"><Plus /></el-icon>
+                    </el-upload>
+                    <span class="upload-tip">晒图最多 4 张</span>
+                </div>
+            </div>
+
+            <!-- 已购快照（自动带上买的东西） -->
+            <div class="purchase-select" v-if="isProduct() && purchasedOrders.length">
+                <span class="score-label">购买凭证</span>
+                <el-select v-model="selectedOrderId" placeholder="选择购买订单（可清空不展示）" clearable
+                    size="small" style="flex:1">
+                    <el-option v-for="o in purchasedOrders" :key="o.orderId" :value="o.orderId"
+                        :label="`已购「${o.productName}」${o.skuName ? ' ' + o.skuName : ''}`" />
+                </el-select>
+            </div>
+
             <div class="publish-actions">
                 <el-button type="primary" :loading="submitting" @click="submitComment">发布评论</el-button>
             </div>
@@ -239,7 +361,15 @@ watch(() => [props.targetType, props.targetId], () => {
                 <div class="comment-body">
                     <div class="comment-head">
                         <span class="nickname">{{ root.nickname || '用户已注销' }}</span>
+                        <el-rate v-if="root.score" :model-value="root.score" disabled size="small" class="c-score" />
                         <span class="time">{{ formatTimeShort(root.createTime) }}</span>
+                    </div>
+                    <el-tag v-if="root.purchasedText" size="small" type="warning" effect="plain" class="purchased-tag">
+                        🛍 {{ root.purchasedText }}
+                    </el-tag>
+                    <div class="comment-images" v-if="root.images?.length">
+                        <el-image v-for="(img, i) in root.images" :key="img" :src="img" fit="cover"
+                            class="c-thumb" :preview-src-list="root.images" :initial-index="i" />
                     </div>
                     <div class="comment-content">{{ root.content }}</div>
                     <div class="comment-actions">
@@ -327,6 +457,22 @@ watch(() => [props.targetType, props.targetId], () => {
 .comment-section {
     margin-top: 20px;
 
+    // 紧凑模式：嵌入店铺评价等场景，弱化卡片外观
+    &.is-compact {
+        margin-top: 10px;
+        --el-card-border-color: transparent;
+        --el-card-border-radius: 0;
+        background-color: #f7f8fa;
+
+        :deep(.el-card__header) {
+            padding: 8px 0 4px;
+        }
+
+        :deep(.el-card__body) {
+            padding: 0 0 8px;
+        }
+    }
+
     .section-header {
         display: flex;
         align-items: center;
@@ -341,11 +487,99 @@ watch(() => [props.targetType, props.targetId], () => {
     .publish-box {
         margin-bottom: 20px;
 
+        .product-score,
+        .purchase-select {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+
+            .score-label {
+                font-size: 13px;
+                color: #666;
+                white-space: nowrap;
+            }
+        }
+
+        .image-upload {
+            margin-bottom: 10px;
+
+            .image-list {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                .thumb {
+                    width: 72px;
+                    height: 72px;
+                    border-radius: 6px;
+                }
+
+                .image-item {
+                    position: relative;
+
+                    .img-remove {
+                        position: absolute;
+                        top: -6px;
+                        right: -6px;
+                        color: #909399;
+                        font-size: 16px;
+                        cursor: pointer;
+                        background: #fff;
+                        border-radius: 50%;
+
+                        &:hover { color: #f56c6c; }
+                    }
+                }
+
+                .img-add {
+                    width: 72px;
+                    height: 72px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px dashed var(--el-border-color);
+                    border-radius: 6px;
+                    color: #8c939d;
+                    font-size: 22px;
+                    cursor: pointer;
+
+                    &:hover { border-color: var(--el-color-primary); color: var(--el-color-primary); }
+                }
+
+                .upload-tip {
+                    color: #bbb;
+                    font-size: 12px;
+                }
+            }
+        }
+
         .publish-actions {
             margin-top: 8px;
             display: flex;
             justify-content: flex-end;
         }
+    }
+
+    .purchased-tag {
+        margin: 4px 0;
+    }
+
+    .comment-images {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 6px 0;
+
+        .c-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+        }
+    }
+
+    .c-score {
+        margin-left: 2px;
     }
 
     .comment-item {

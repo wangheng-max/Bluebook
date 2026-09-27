@@ -4,20 +4,9 @@ import com.wangheng.common.PageBean;
 import com.wangheng.product.pojo.Product;
 import com.wangheng.product.pojo.ProductSaveDTO;
 import com.wangheng.product.pojo.ProductSku;
-
-
-
-
-
-
-
-
-
-
-
-
 import java.math.BigDecimal;
 import java.util.List;
+
 
 /**
  * 商品服务。

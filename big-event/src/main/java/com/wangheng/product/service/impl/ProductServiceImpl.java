@@ -1,6 +1,11 @@
 package com.wangheng.product.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.wangheng.common.PageBean;
+import com.wangheng.exception.MerchantAuthException;
 import com.wangheng.product.mapper.ProductCategoryMapper;
 import com.wangheng.product.mapper.ProductMapper;
 import com.wangheng.product.mapper.ProductSkuMapper;
@@ -9,42 +14,16 @@ import com.wangheng.product.pojo.ProductSaveDTO;
 import com.wangheng.product.pojo.ProductSku;
 import com.wangheng.product.pojo.ProductSkuDTO;
 import com.wangheng.product.service.ProductService;
-
-
-
-
-
-
-
-
-
-
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.wangheng.exception.MerchantAuthException;
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 商品服务实现。

@@ -1,24 +1,15 @@
 package com.wangheng.auth;
 
+import com.wangheng.exception.MerchantAuthException;
 import com.wangheng.merchant.mapper.MerchantInfoMapper;
 import com.wangheng.user.mapper.UserRoleMapper;
-
-
-
-
-
-
-
-import com.wangheng.exception.MerchantAuthException;
-
-
 import com.wangheng.utils.ThreadLocalUtil;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 商家/管理员权限校验器（v1.1 商家认证机制，设计文档《商家认证流程设计》）。

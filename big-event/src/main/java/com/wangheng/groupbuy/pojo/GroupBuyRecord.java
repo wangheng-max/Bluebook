@@ -1,11 +1,12 @@
 package com.wangheng.groupbuy.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+
 
 /**
  * 团购记录实体（表 group_buy_record）。

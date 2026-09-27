@@ -1,9 +1,10 @@
 package com.wangheng.comment.pojo;
 
-import lombok.Data;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Data;
+
+
 
 /**
  * 评论展示 VO：联表带出评论人昵称/头像，回复额外带被回复人昵称；
@@ -23,6 +24,11 @@ public class CommentVO {
     private String userPic;//评论人头像
     private String replyNickname;//被回复人昵称（回复才有）
     private Integer likeCount;
+    private Integer score;//商品评分（仅商品顶级评论）
+    private Integer orderId;//关联购买订单ID（商品晒单）
+    private List<String> images;//评论图片
+    private String imagesJson;//图片URL串（DB 原样，服务层解析到 images 后置空）
+    private String purchasedText;//已购快照文本（如：已购「商品名」规格：xx）
     private Boolean liked;//当前用户是否已点赞
     private LocalDateTime createTime;
     private Integer replyCount;//该顶级评论下的回复总数

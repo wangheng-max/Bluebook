@@ -8,26 +8,10 @@ import com.wangheng.coupon.pojo.UserCouponVO;
 import com.wangheng.coupon.service.CouponGrabService;
 import com.wangheng.coupon.service.CouponService;
 import com.wangheng.coupon.util.CouponRateLimiter;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
@@ -40,9 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 秒杀抢券接口。

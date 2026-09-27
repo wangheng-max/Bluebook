@@ -5,22 +5,6 @@ import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
 import com.wangheng.search.pojo.SearchUserVO;
 import com.wangheng.search.service.SearchService;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;

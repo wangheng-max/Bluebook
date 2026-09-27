@@ -1,20 +1,13 @@
 package com.wangheng.coupon.mapper;
 
 import com.wangheng.coupon.pojo.CouponType;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import java.util.List;
 
 /**
  * 优惠券类型表 Mapper（商家创建，数据隔离 create_user_id）

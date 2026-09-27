@@ -5,10 +5,11 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Data;
+
+
 
 /**
  * 团购活动创建/修改参数（POST /group-buy、PUT /group-buy/{id}，商家接口）。

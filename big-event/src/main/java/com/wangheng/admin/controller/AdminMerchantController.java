@@ -2,26 +2,10 @@ package com.wangheng.admin.controller;
 
 import com.wangheng.admin.pojo.AuditRequestDTO;
 import com.wangheng.admin.service.AdminMerchantService;
+import com.wangheng.anno.RequireAdmin;
 import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
 import com.wangheng.merchant.pojo.MerchantInfo;
-
-
-
-
-
-
-
-
-
-
-
-import com.wangheng.anno.RequireAdmin;
-
-
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+
+
+
 
 /**
  * 管理员商家审核接口（v1.1 商家认证机制，仅管理员 @RequireAdmin）。

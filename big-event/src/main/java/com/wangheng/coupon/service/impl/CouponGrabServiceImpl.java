@@ -1,5 +1,6 @@
 package com.wangheng.coupon.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wangheng.common.Result;
 import com.wangheng.coupon.mapper.CouponStockMapper;
 import com.wangheng.coupon.mapper.CouponTypeMapper;
@@ -10,31 +11,12 @@ import com.wangheng.coupon.pojo.CouponType;
 import com.wangheng.coupon.pojo.UserCoupon;
 import com.wangheng.coupon.service.CouponGrabService;
 import com.wangheng.coupon.util.CouponStockStatusHelper;
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.websocket.ChatWebSocketHandler;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DuplicateKeyException;
@@ -43,11 +25,30 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * 抢券服务实现。

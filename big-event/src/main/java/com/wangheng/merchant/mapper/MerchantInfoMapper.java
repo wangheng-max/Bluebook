@@ -1,18 +1,11 @@
 package com.wangheng.merchant.mapper;
 
 import com.wangheng.merchant.pojo.MerchantInfo;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import java.util.List;
 
 /**
  * 商家认证信息表 Mapper（v1.1 商家认证机制）

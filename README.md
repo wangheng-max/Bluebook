@@ -118,6 +118,8 @@ CREATE DATABASE big_event DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_
 | 2 | `mall_migration.sql` | 商城团购 DDL（商品/SKU/团购/优惠券/订单/地址/商家/角色等 17 张表） |
 | 3 | `comment_migration.sql` | 评论模块（comment/comment_like） |
 | 4 | `content_shop_migration.sql` | 内容带货 + 商家评分（article.product_ids 列 + merchant_rating 表） |
+| 5 | `social_migration.sql` | 社交与评价（comment 评分/晒图列、user.bio、follow 表） |
+| 6 | `favorite_folder_migration.sql` | 收藏夹（article_favorite.folder_id 列 + favorite_folder 表） |
 
 > 除 `migration.sql` 第 6 步（重建分类表，依赖旧外键名）外，其余语句均 `IF NOT EXISTS` / 幂等，可重复执行。
 

@@ -3,6 +3,7 @@ package com.wangheng.admin.pojo;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+
 /**
  * 管理员审核参数（POST /admin/merchant/{userId}/audit）
  */

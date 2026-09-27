@@ -1,9 +1,10 @@
 package com.wangheng.message.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+
 
 /**
  * 聊天消息（msg_type: 0-文本 1-文章转发）

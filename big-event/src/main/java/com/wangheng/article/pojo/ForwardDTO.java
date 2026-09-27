@@ -3,6 +3,7 @@ package com.wangheng.article.pojo;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+
 /**
  * 转发文章请求体
  */

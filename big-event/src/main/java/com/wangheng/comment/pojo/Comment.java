@@ -1,8 +1,9 @@
 package com.wangheng.comment.pojo;
 
+import java.time.LocalDateTime;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+
 
 /**
  * 评论实体（文章/商品通用，target_type 区分目标）。
@@ -20,6 +21,9 @@ public class Comment {
     private Integer rootId;//根评论ID，顶级评论为0
     private Integer replyUserId;//被回复用户ID
     private Integer likeCount;//点赞数
+    private Integer score;//商品评分1-5（仅商品顶级评论）
+    private String images;//评论图片URL JSON数组
+    private Integer orderId;//关联购买订单ID（商品晒单）
     private LocalDateTime createTime;//创建时间
     private LocalDateTime updateTime;//更新时间
 }

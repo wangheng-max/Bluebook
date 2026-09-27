@@ -6,14 +6,6 @@ import com.wangheng.merchant.pojo.MerchantStatusVO;
 import com.wangheng.merchant.pojo.ShopInfoDTO;
 
 
-
-
-
-
-
-
-
-
 /**
  * 商家认证服务（v1.1 商家认证机制）
  */

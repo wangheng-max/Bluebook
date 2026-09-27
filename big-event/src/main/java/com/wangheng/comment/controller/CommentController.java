@@ -5,29 +5,15 @@ import com.wangheng.comment.pojo.CommentVO;
 import com.wangheng.comment.service.CommentService;
 import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 /**
- * 评论接口（文章/商品通用，targetType=article/product）。
+ * 评论接口（文章/商品/商家评价通用，targetType=article/product/rating）。
  * 读接口（list/replies）匿名可访问（商品详情页公开）；发布/点赞/删除需登录。
  */
 @RestController
@@ -78,6 +64,12 @@ public class CommentController {
             pageSize = 50;
         }
         return Result.success(commentService.replies(rootId, pageNum, pageSize));
+    }
+
+    /** 商品评分统计（公开）：{ avgScore, scoreCount } */
+    @GetMapping("/stats")
+    public Result<Map<String, Object>> stats(@RequestParam String targetType, @RequestParam Integer targetId) {
+        return Result.success(commentService.stats(targetType, targetId));
     }
 
     /** 点赞评论，返回最新点赞数 */

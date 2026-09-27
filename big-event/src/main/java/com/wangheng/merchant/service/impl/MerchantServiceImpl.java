@@ -1,5 +1,7 @@
 package com.wangheng.merchant.service.impl;
 
+import com.wangheng.auth.MerchantPermissionChecker;
+import com.wangheng.exception.MerchantAuthException;
 import com.wangheng.merchant.mapper.MerchantInfoMapper;
 import com.wangheng.merchant.pojo.MerchantApplyDTO;
 import com.wangheng.merchant.pojo.MerchantInfo;
@@ -8,37 +10,14 @@ import com.wangheng.merchant.pojo.ShopInfoDTO;
 import com.wangheng.merchant.service.MerchantService;
 import com.wangheng.user.mapper.UserRoleMapper;
 import com.wangheng.user.pojo.UserRole;
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.wangheng.auth.MerchantPermissionChecker;
-import com.wangheng.exception.MerchantAuthException;
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
+import java.time.LocalDateTime;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Map;
 
 /**
  * 商家认证服务实现（v1.1 商家认证机制）。

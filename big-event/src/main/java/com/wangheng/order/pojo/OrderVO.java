@@ -1,17 +1,18 @@
 package com.wangheng.order.pojo;
 
-
-
-
-
-
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Data;
+
+
+
+
+
+
+
+
 
 /**
  * 订单返回对象：订单 + 明细列表 + 最新退款单状态（null=无退款申请）。

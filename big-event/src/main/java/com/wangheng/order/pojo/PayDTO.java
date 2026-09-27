@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+
 /**
  * 支付参数（POST /order/{id}/pay，本期模拟支付）
  */

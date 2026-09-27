@@ -1,27 +1,12 @@
 package com.wangheng.merchant.controller;
 
+import com.wangheng.anno.RequireMerchant;
 import com.wangheng.common.Result;
 import com.wangheng.merchant.pojo.MerchantApplyDTO;
 import com.wangheng.merchant.pojo.MerchantInfo;
 import com.wangheng.merchant.pojo.MerchantStatusVO;
 import com.wangheng.merchant.pojo.ShopInfoDTO;
 import com.wangheng.merchant.service.MerchantService;
-
-
-
-
-
-
-
-
-
-import com.wangheng.anno.RequireMerchant;
-
-
-
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * 商家认证接口（v1.1 商家认证机制）。

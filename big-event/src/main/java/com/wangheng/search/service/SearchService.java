@@ -5,17 +5,6 @@ import com.wangheng.common.PageBean;
 import com.wangheng.search.pojo.SearchUserVO;
 
 
-
-
-
-
-
-
-
-
-
-
-
 public interface SearchService {
 
     // 搜索公开笔记

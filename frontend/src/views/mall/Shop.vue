@@ -1,7 +1,11 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 import { shopInfoService, shopProductsService, shopRatingsService } from '@/api/shop.js'
+import { followService, unfollowService, followStatusService } from '@/api/follow.js'
+import CommentSection from '@/components/CommentSection.vue'
+import useUserInfoStore from '@/stores/userInfo.js'
 import { money } from '@/utils/mall.js'
 
 const route = useRoute()
@@ -19,6 +23,10 @@ const ratingPageSize = ref(5)
 const loading = ref(false)
 
 const merchantUserId = computed(() => Number(route.params.merchantUserId))
+const userInfoStore = useUserInfoStore()
+const followed = ref(false)
+const followCount = ref(0)
+const followLoading = ref(false)
 
 const loadShop = async () => {
     loading.value = true
@@ -29,6 +37,37 @@ const loadShop = async () => {
         shop.value = null
     } finally {
         loading.value = false
+    }
+    // 关注状态与粉丝数（匿名也可看，followed 恒 false）
+    try {
+        const st = await followStatusService(2, merchantUserId.value)
+        followed.value = !!st.data?.followed
+        followCount.value = st.data?.followerCount || 0
+    } catch (e) {
+        followed.value = false
+    }
+}
+
+const toggleFollow = async () => {
+    if (!userInfoStore.info?.id) {
+        ElMessage.warning('请先登录后再关注店铺')
+        return
+    }
+    followLoading.value = true
+    try {
+        if (followed.value) {
+            await unfollowService(2, merchantUserId.value)
+            followed.value = false
+            followCount.value = Math.max(0, followCount.value - 1)
+            ElMessage.success('已取消关注')
+        } else {
+            await followService(2, merchantUserId.value)
+            followed.value = true
+            followCount.value += 1
+            ElMessage.success('已关注店铺')
+        }
+    } finally {
+        followLoading.value = false
     }
 }
 
@@ -47,6 +86,7 @@ const loadProducts = async () => {
 }
 
 const loadRatings = async () => {
+    expandedRatingId.value = null
     try {
         const result = await shopRatingsService(merchantUserId.value, {
             pageNum: ratingPage.value,
@@ -68,6 +108,25 @@ const onProductPage = (num) => {
 const onRatingPage = (num) => {
     ratingPage.value = num
     loadRatings()
+}
+
+// ===== 评价互动：展示所购商品 + 展开评论区 =====
+const expandedRatingId = ref(null)
+
+const toggleRatingComments = (rating) => {
+    expandedRatingId.value = expandedRatingId.value === rating.id ? null : rating.id
+}
+
+// 评论区挂载/发布后回报最新条数，保持按钮计数同步
+const onCommentCountChange = (rating, count) => {
+    rating.commentCount = count
+}
+
+// 点击所购商品快照跳商品详情
+const goRatingProduct = (rating) => {
+    if (rating.productId) {
+        router.push(`/mall/product/${rating.productId}`)
+    }
 }
 
 watch(merchantUserId, () => {
@@ -95,7 +154,14 @@ watch(merchantUserId, () => {
                             📍 {{ shop.province }}{{ shop.city }}{{ shop.district }} {{ shop.address }}
                         </span>
                         <span>📦 在架商品 {{ shop.productCount }}</span>
+                        <span>👥 粉丝 {{ followCount }}</span>
                     </div>
+                </div>
+                <div class="follow-area">
+                    <el-button :type="followed ? 'default' : 'primary'" round :loading="followLoading"
+                        @click="toggleFollow">
+                        {{ followed ? '已关注' : '+ 关注店铺' }}
+                    </el-button>
                 </div>
                 <div class="shop-score">
                     <div class="score-top">
@@ -147,8 +213,22 @@ watch(merchantUserId, () => {
                                 <span class="r-name">{{ r.username }}</span>
                                 <el-rate :model-value="r.score" disabled size="small" class="r-rate" />
                             </div>
+                            <!-- 所购商品快照：点击进商品详情 -->
+                            <div class="r-product" v-if="r.productName" @click="goRatingProduct(r)">
+                                <img v-if="r.productImg" :src="r.productImg" class="r-product-img" />
+                                <span class="r-product-name">已购「{{ r.productName }}」</span>
+                            </div>
                             <div class="r-content" v-if="r.content">{{ r.content }}</div>
-                            <div class="r-time">{{ r.createTime }}</div>
+                            <div class="r-foot">
+                                <span class="r-time">{{ r.createTime }}</span>
+                                <span class="r-comment-toggle" @click="toggleRatingComments(r)">
+                                    💬 {{ expandedRatingId === r.id ? '收起评论' : '评论' }}
+                                    <template v-if="r.commentCount > 0">（{{ r.commentCount }}）</template>
+                                </span>
+                            </div>
+                            <!-- 评价的评论区（匿名可看，登录可发言/点赞） -->
+                            <CommentSection v-if="expandedRatingId === r.id" target-type="rating" :target-id="r.id"
+                                compact @count-change="(n) => onCommentCountChange(r, n)" />
                         </div>
                     </div>
                 </div>
@@ -196,6 +276,10 @@ watch(merchantUserId, () => {
                 color: #999;
                 font-size: 13px;
             }
+        }
+
+        .follow-area {
+            padding: 0 8px;
         }
 
         .shop-score {
@@ -305,6 +389,38 @@ watch(merchantUserId, () => {
                     .r-name { font-weight: 600; font-size: 14px; }
                 }
 
+                .r-product {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin: 8px 0 4px;
+                    padding: 4px 10px 4px 4px;
+                    background: #fff7e6;
+                    border: 1px solid #ffe1b3;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    max-width: 100%;
+
+                    &:hover { border-color: #ffb84d; }
+
+                    .r-product-img {
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 4px;
+                        object-fit: cover;
+                        background: #f5f7fa;
+                        flex-shrink: 0;
+                    }
+
+                    .r-product-name {
+                        font-size: 12px;
+                        color: #b26b00;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+
                 .r-content {
                     margin: 8px 0 4px;
                     color: #444;
@@ -312,7 +428,22 @@ watch(merchantUserId, () => {
                     line-height: 1.6;
                 }
 
-                .r-time { color: #bbb; font-size: 12px; }
+                .r-foot {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+
+                    .r-time { color: #bbb; font-size: 12px; }
+
+                    .r-comment-toggle {
+                        color: #666;
+                        font-size: 13px;
+                        cursor: pointer;
+                        user-select: none;
+
+                        &:hover { color: #409eff; }
+                    }
+                }
             }
         }
     }

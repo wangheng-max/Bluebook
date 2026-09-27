@@ -1,17 +1,18 @@
 package com.wangheng.user.pojo;
 
-
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+
+
+
 //lombok  在编译阶段,为实体类自动生成setter  getter toString
 // pom文件中引入依赖   在实体类上添加注解
 
@@ -34,6 +35,7 @@ public class User {
     @Email
     private String email;//邮箱
     private String userPic;//用户头像地址
+    private String bio;//自我介绍
     private LocalDateTime createTime;//创建时间
     private LocalDateTime updateTime;//更新时间
 }

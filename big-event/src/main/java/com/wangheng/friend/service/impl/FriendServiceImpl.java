@@ -1,5 +1,7 @@
 package com.wangheng.friend.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.wangheng.common.PageBean;
 import com.wangheng.friend.mapper.FriendMapper;
 import com.wangheng.friend.pojo.FriendRelation;
@@ -8,37 +10,11 @@ import com.wangheng.friend.pojo.FriendVO;
 import com.wangheng.friend.service.FriendService;
 import com.wangheng.user.mapper.UserMapper;
 import com.wangheng.user.pojo.User;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class FriendServiceImpl implements FriendService {

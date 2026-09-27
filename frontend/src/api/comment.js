@@ -29,3 +29,8 @@ export const commentUnlikeService = (id) => {
 export const commentDeleteService = (id) => {
     return request.delete(`/comment/${id}`)
 }
+
+// 商品评分统计（公开）：{ avgScore, scoreCount }
+export const commentStatsService = (params) => {
+    return request.get('/comment/stats', { params })
+}

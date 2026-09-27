@@ -1,41 +1,42 @@
 package com.wangheng.article.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.wangheng.article.mapper.ArticleMapper;
 import com.wangheng.article.pojo.Article;
 import com.wangheng.article.pojo.NoteSearchVO;
 import com.wangheng.article.service.CommunityService;
 import com.wangheng.article.util.NoteVOConverter;
 import com.wangheng.common.PageBean;
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-
-
-
-
-
-
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @Service
 public class CommunityServiceImpl implements CommunityService {
@@ -109,6 +110,21 @@ public class CommunityServiceImpl implements CommunityService {
         NoteSearchVO vo = noteVOConverter.convert(article);
         vo.setContent(article.getContent());
         return vo;
+    }
+
+    @Override
+    public PageBean<NoteSearchVO> articlesByUser(Integer userId, Integer pageNum, Integer pageSize) {
+        PageBean<NoteSearchVO> pb = new PageBean<>();
+        PageHelper.startPage(pageNum, pageSize);
+        List<Article> list = articleMapper.listPublishedByUser(userId);
+        Page<Article> p = (Page<Article>) list;
+        List<NoteSearchVO> voList = new ArrayList<>();
+        for (Article a : p.getResult()) {
+            voList.add(noteVOConverter.convert(a));
+        }
+        pb.setTotal(p.getTotal());
+        pb.setItems(voList);
+        return pb;
     }
 
     @Override

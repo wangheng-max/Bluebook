@@ -1,5 +1,6 @@
 package com.wangheng.coupon.controller;
 
+import com.wangheng.anno.RequireMerchant;
 import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
 import com.wangheng.coupon.pojo.CouponStatisticsVO;
@@ -8,24 +9,6 @@ import com.wangheng.coupon.pojo.CouponStockDTO;
 import com.wangheng.coupon.pojo.CouponTypeDTO;
 import com.wangheng.coupon.pojo.GrantDTO;
 import com.wangheng.coupon.service.MerchantCouponService;
-
-
-
-
-
-
-
-
-
-import com.wangheng.anno.RequireMerchant;
-
-
-
-
-
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * 商家优惠券管理接口（仅认证商家，@RequireMerchant + 数据隔离）。

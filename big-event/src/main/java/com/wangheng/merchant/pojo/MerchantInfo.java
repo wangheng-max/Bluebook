@@ -1,11 +1,12 @@
 package com.wangheng.merchant.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+
 
 /**
  * 商家认证信息实体（表 merchant_info，v1.1 商家认证机制）。
