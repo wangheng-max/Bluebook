@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+
 /**
  * 商家评分创建参数（POST /merchant/rating，订单维度一单一评）。
  */

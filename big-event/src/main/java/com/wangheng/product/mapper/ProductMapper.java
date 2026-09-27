@@ -1,12 +1,8 @@
 package com.wangheng.product.mapper;
 
 import com.wangheng.product.pojo.Product;
-
-
-
-
-
-
+import java.math.BigDecimal;
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -14,8 +10,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * 商品表 Mapper。

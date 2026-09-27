@@ -3,23 +3,12 @@ package com.wangheng.article.controller;
 import com.wangheng.article.pojo.Category;
 import com.wangheng.article.service.CategoryService;
 import com.wangheng.common.Result;
-
-
-
-
-
-
-
-
-
-
-
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/category")

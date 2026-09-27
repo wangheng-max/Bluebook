@@ -4,25 +4,11 @@ import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
 import com.wangheng.message.pojo.Message;
 import com.wangheng.message.service.MessageService;
-
-
-
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/message")

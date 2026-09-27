@@ -6,22 +6,11 @@ import com.wangheng.friend.pojo.FriendRequestDTO;
 import com.wangheng.friend.pojo.FriendRequestVO;
 import com.wangheng.friend.pojo.FriendVO;
 import com.wangheng.friend.service.FriendService;
-
-
-
-
-
-
-
-
-
-
-
-
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/friends")

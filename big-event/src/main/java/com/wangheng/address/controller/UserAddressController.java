@@ -5,22 +5,7 @@ import com.wangheng.address.pojo.UserAddress;
 import com.wangheng.address.service.UserAddressService;
 import com.wangheng.common.Result;
 import com.wangheng.user.controller.UserController;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+
+
 
 /**
  * 收货地址接口（商城团购功能，登录用户）。

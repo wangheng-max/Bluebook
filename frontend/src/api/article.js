@@ -41,9 +41,9 @@ export const articleUnlikeService = (id)=>{
     return request.delete(`/article/${id}/like`)
 }
 
-//收藏
-export const articleFavoriteService = (id)=>{
-    return request.post(`/article/${id}/favorite`)
+//收藏（folderId 不传=默认收藏夹）
+export const articleFavoriteService = (id, folderId)=>{
+    return request.post(`/article/${id}/favorite`, null, { params: folderId ? { folderId } : {} })
 }
 
 //取消收藏
@@ -59,4 +59,34 @@ export const articleInteractStatusService = (id)=>{
 //转发给好友
 export const articleForwardService = (id, data)=>{
     return request.post(`/article/${id}/forward`, data)
+}
+// ===== 收藏夹 =====
+// 我的收藏夹列表（首项恒为"默认收藏夹" id=null）
+export const myFavoriteFoldersService = () => {
+    return request.get('/article/favorite/folders')
+}
+
+// 创建收藏夹
+export const createFavoriteFolderService = (name) => {
+    return request.post('/article/favorite/folder', null, { params: { name } })
+}
+
+// 重命名收藏夹
+export const renameFavoriteFolderService = (id, name) => {
+    return request.put(`/article/favorite/folder/${id}`, null, { params: { name } })
+}
+
+// 删除收藏夹（夹内收藏回退默认收藏夹）
+export const deleteFavoriteFolderService = (id) => {
+    return request.delete(`/article/favorite/folder/${id}`)
+}
+
+// TA 赞过的文章（个人主页）
+export const likedArticlesService = (userId, params) => {
+    return request.get(`/article/user/${userId}/liked`, { params })
+}
+
+// TA 的收藏文章（folderId 不传=默认收藏夹）
+export const favoriteArticlesService = (userId, params) => {
+    return request.get(`/article/user/${userId}/favorites`, { params })
 }

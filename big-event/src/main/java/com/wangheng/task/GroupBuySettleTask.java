@@ -1,16 +1,17 @@
 package com.wangheng.task;
 
 import com.wangheng.order.service.OrderService;
-
-
-
-
-
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+
+
+
+
+
+
 
 /**
  * 团购结算定时任务（设计文档《团购业务规则（成团与退款）》）：每分钟检查到期活动。

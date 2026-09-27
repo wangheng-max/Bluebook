@@ -1,39 +1,23 @@
 package com.wangheng.product.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wangheng.article.pojo.CategorySaveDTO;
+import com.wangheng.exception.MerchantAuthException;
 import com.wangheng.product.mapper.ProductCategoryMapper;
 import com.wangheng.product.pojo.ProductCategory;
 import com.wangheng.product.pojo.ProductCategoryVO;
 import com.wangheng.product.service.ProductCategoryService;
-
-
-
-
-
-
-
-
-
-
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wangheng.exception.MerchantAuthException;
-
-
-
-
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 /**
  * 商品分类服务实现。

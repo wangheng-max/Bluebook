@@ -1,18 +1,19 @@
 package com.wangheng.article.pojo;
 
 import com.wangheng.product.pojo.ProductBriefVO;
-
-
-
-
-
-
-
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+
+
+
+
+
+
+
+
 
 /**
  * 公开笔记搜索结果展示对象
@@ -30,6 +31,7 @@ public class NoteSearchVO {
     private String authorName;    // 作者用户名
     private String authorAvatar;  // 作者头像URL
     private Integer likeCount;    // 点赞数
+    private Boolean liked;        // 当前用户是否已点赞（匿名恒 false，信息流卡片可直接点赞）
     private Integer commentCount; // 评论数
     private Integer viewCount;    // 浏览量
     private Integer favoriteCount;// 收藏数

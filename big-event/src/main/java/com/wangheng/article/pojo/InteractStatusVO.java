@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 /**
  * 互动状态查询结果：我是否已赞/已藏 + 最新计数
  */

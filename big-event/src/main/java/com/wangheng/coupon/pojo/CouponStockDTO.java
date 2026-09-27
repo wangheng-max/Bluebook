@@ -3,9 +3,10 @@ package com.wangheng.coupon.pojo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+
 
 /**
  * 优惠券发放活动创建参数（POST /merchant/coupon/stock，商家接口）

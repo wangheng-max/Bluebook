@@ -2,23 +2,12 @@ package com.wangheng.order.service;
 
 import com.wangheng.common.PageBean;
 import com.wangheng.order.pojo.OrderCreateDTO;
+import com.wangheng.order.pojo.OrderItem;
 import com.wangheng.order.pojo.OrderVO;
 import com.wangheng.order.pojo.PayDTO;
 import com.wangheng.order.pojo.RefundApplyDTO;
 import com.wangheng.order.pojo.RefundOrderVO;
-
-
-
-
-
-
-
-
-
-
-
-
-
+import java.util.List;
 
 /**
  * 订单服务。
@@ -53,4 +42,9 @@ public interface OrderService {
 
     /** 团购结算（定时任务）：成团→发货等待；未成团→自动退款 */
     void settleGroupBuys();
+
+    /**
+     * 我购买某商品的有效订单明细（状态 1/2/3，商品评论晒单选择用，新的在前）
+     */
+    List<OrderItem> myPurchasedItems(Integer productId);
 }

@@ -1,18 +1,12 @@
 package com.wangheng.user.mapper;
 
 import com.wangheng.user.pojo.User;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import java.util.List;
 
 @Mapper
 public interface UserMapper {
@@ -30,12 +24,15 @@ public interface UserMapper {
     void add(String username, String password);
 
     //修改信息
-    @Update("update user set nickname=#{nickname},email=#{email},update_time=#{updateTime} where id=#{id}")
+    @Update("update user set nickname=#{nickname},email=#{email},bio=#{bio},update_time=#{updateTime} where id=#{id}")
     void update(User user);
     //修改头像
     @Update("update user set user_pic=#{avatarUrl},update_time=now() where id=#{id}")
     void updateAvatar(String avatarUrl,Integer id);
     //修改密码
+    @Update("update user set bio=#{bio},update_time=now() where id=#{id}")
+    void updateBio(@Param("bio") String bio, @Param("id") Integer id);
+
     @Update("update user set password=#{md5String},update_time=now() where id=#{id}")
     void updatePwd(String md5String, Integer id);
 

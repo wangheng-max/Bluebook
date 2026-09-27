@@ -1,4 +1,6 @@
 <script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
 import { ref } from 'vue'
 import { searchUsersService } from '@/api/search.js'
 import { friendSendRequestService } from '@/api/friend.js'
@@ -66,9 +68,12 @@ const onPageChange = (num) => {
 
         <div class="user-list" v-if="users.length > 0">
             <div v-for="user in users" :key="user.userId" class="user-card">
-                <el-avatar :size="48" :src="user.avatar">{{ user.nickname?.charAt(0) }}</el-avatar>
-                <div class="user-info">
-                    <div class="user-name">{{ user.nickname }} <span class="username">@{{ user.username }}</span></div>
+                <div class="user-main" @click="router.push(`/user/homepage/${user.userId}`)"
+                    title="查看 TA 的个人主页">
+                    <el-avatar :size="48" :src="user.avatar">{{ user.nickname?.charAt(0) }}</el-avatar>
+                    <div class="user-info">
+                        <div class="user-name">{{ user.nickname }} <span class="username">@{{ user.username }}</span></div>
+                    </div>
                 </div>
                 <div class="user-action">
                     <el-tag v-if="user.isFriend" type="success" size="small">已是好友</el-tag>

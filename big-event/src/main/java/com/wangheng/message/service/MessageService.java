@@ -2,17 +2,9 @@ package com.wangheng.message.service;
 
 import com.wangheng.common.PageBean;
 import com.wangheng.message.pojo.Message;
-
-
-
-
-
-
-
-
-
-
 import java.util.List;
+
+
 
 public interface MessageService {
 

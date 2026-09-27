@@ -5,20 +5,8 @@ import com.wangheng.groupbuy.pojo.GroupBuy;
 import com.wangheng.groupbuy.pojo.GroupBuyDetailVO;
 import com.wangheng.groupbuy.pojo.GroupBuyProgressVO;
 import com.wangheng.groupbuy.pojo.GroupBuySaveDTO;
-
-
-
-
-
-
-
-
-
-
-
-
-
 import java.util.List;
+
 
 /**
  * 团购活动服务。

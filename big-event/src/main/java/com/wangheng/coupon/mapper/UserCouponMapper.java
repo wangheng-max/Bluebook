@@ -2,20 +2,12 @@ package com.wangheng.coupon.mapper;
 
 import com.wangheng.coupon.pojo.UserCoupon;
 import com.wangheng.coupon.pojo.UserCouponVO;
-
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import java.util.List;
 
 /**
  * 用户优惠券表 Mapper。

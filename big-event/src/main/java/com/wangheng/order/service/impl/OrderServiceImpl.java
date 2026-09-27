@@ -1,11 +1,16 @@
 package com.wangheng.order.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.wangheng.address.mapper.UserAddressMapper;
 import com.wangheng.common.PageBean;
 import com.wangheng.coupon.mapper.CouponTypeMapper;
 import com.wangheng.coupon.mapper.UserCouponMapper;
 import com.wangheng.coupon.pojo.CouponType;
 import com.wangheng.coupon.pojo.UserCoupon;
+import com.wangheng.exception.MerchantAuthException;
 import com.wangheng.groupbuy.mapper.GroupBuyMapper;
 import com.wangheng.groupbuy.mapper.GroupBuyRecordMapper;
 import com.wangheng.groupbuy.pojo.GroupBuy;
@@ -29,74 +34,8 @@ import com.wangheng.product.mapper.ProductMapper;
 import com.wangheng.product.mapper.ProductSkuMapper;
 import com.wangheng.product.pojo.Product;
 import com.wangheng.product.pojo.ProductSku;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.wangheng.exception.MerchantAuthException;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
 import com.wangheng.websocket.ChatWebSocketHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -105,6 +44,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 /**
  * 订单服务实现。
@@ -383,6 +329,12 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.markRefunding(orderId);
         evictCaches(userId);
         notifyOrder(userId, orderId, "退款申请已提交，等待商家处理");
+    }
+
+    @Override
+    public List<OrderItem> myPurchasedItems(Integer productId) {
+        Integer userId = currentUserId();
+        return orderMapper.findPurchasedItems(userId, productId);
     }
 
     @Override

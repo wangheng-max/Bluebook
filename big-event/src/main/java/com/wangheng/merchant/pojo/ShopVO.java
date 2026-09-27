@@ -1,9 +1,10 @@
 package com.wangheng.merchant.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+
 
 /**
  * 店铺主页信息（公开接口 GET /shop/{merchantUserId}）。
@@ -22,6 +23,8 @@ public class ShopVO {
     private Double avgScore;
     /** 评分总数 */
     private Integer ratingCount;
+    /** 店铺粉丝数（关注店铺的人数） */
+    private Integer followerCount;
     /** 在架商品数 */
     private Integer productCount;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

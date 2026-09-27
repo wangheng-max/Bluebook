@@ -3,6 +3,7 @@ package com.wangheng.article.pojo;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+
 /**
  * 商品分类添加/修改参数（POST/PUT /product/category，管理员接口）。
  * id 在修改时必传，添加时忽略。

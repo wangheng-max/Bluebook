@@ -2,20 +2,21 @@ package com.wangheng.coupon.util;
 
 import com.wangheng.coupon.mapper.CouponStockMapper;
 import com.wangheng.coupon.pojo.CouponStock;
-
-
-
-
-
-
-
-
-
+import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+
+
+
+
+
+
+
+
+
+
 
 /**
  * 优惠券发放活动状态工具（抢券/展示/商家管理共用）：

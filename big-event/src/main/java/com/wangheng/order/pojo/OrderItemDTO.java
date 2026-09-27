@@ -1,14 +1,15 @@
 package com.wangheng.order.pojo;
 
-
-
-
-
-
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+
+
+
+
+
+
 
 /**
  * 订单商品项参数（OrderCreateDTO.productItems 的元素）

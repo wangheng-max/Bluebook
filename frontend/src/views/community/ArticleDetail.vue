@@ -9,13 +9,17 @@ import {
     articleUnlikeService,
     articleFavoriteService,
     articleUnfavoriteService,
-    articleForwardService
+    articleForwardService,
+    myFavoriteFoldersService,
+    createFavoriteFolderService
 } from '@/api/article.js'
 import { friendListService } from '@/api/friend.js'
 import CommentSection from '@/components/CommentSection.vue'
+import useUserInfoStore from '@/stores/userInfo.js'
 
 const route = useRoute()
 const router = useRouter()
+const userInfoStore = useUserInfoStore()
 const noteId = route.params.noteId
 
 const article = ref({})
@@ -43,13 +47,30 @@ const loadStatus = async () => {
     favoriteCount.value = result.data.favoriteCount
 }
 
+//点赞：登录校验 + 乐观更新失败回滚 + 请求锁防连点
+const likePending = ref(false)
 const toggleLike = async () => {
-    if (liked.value) {
-        likeCount.value = (await articleUnlikeService(noteId)).data
-        liked.value = false
-    } else {
-        likeCount.value = (await articleLikeService(noteId)).data
-        liked.value = true
+    if (!userInfoStore.info?.id) {
+        ElMessage.warning('请先登录后点赞')
+        router.push('/login')
+        return
+    }
+    if (likePending.value) return
+    likePending.value = true
+    const prevLiked = liked.value
+    const prevCount = likeCount.value
+    liked.value = !prevLiked
+    likeCount.value = prevCount + (prevLiked ? -1 : 1)
+    try {
+        const result = prevLiked
+            ? await articleUnlikeService(noteId)
+            : await articleLikeService(noteId)
+        if (result.data != null) likeCount.value = Number(result.data)
+    } catch (e) {
+        liked.value = prevLiked
+        likeCount.value = prevCount
+    } finally {
+        likePending.value = false
     }
 }
 
@@ -57,9 +78,57 @@ const toggleFavorite = async () => {
     if (favorited.value) {
         favoriteCount.value = (await articleUnfavoriteService(noteId)).data
         favorited.value = false
-    } else {
+        return
+    }
+    // 有自定义收藏夹时先选夹；只有默认收藏夹则直接收藏
+    try {
+        const res = await myFavoriteFoldersService()
+        favoriteFolders.value = res.data || []
+    } catch (e) {
+        favoriteFolders.value = []
+    }
+    if (favoriteFolders.value.length <= 1) {
         favoriteCount.value = (await articleFavoriteService(noteId)).data
         favorited.value = true
+        ElMessage.success('已收藏到默认收藏夹')
+        return
+    }
+    selectedFolderId.value = null
+    newFolderName.value = ''
+    favoriteDialog.value = true
+}
+
+// 收藏夹选择弹窗
+const favoriteDialog = ref(false)
+const favoriteFolders = ref([])
+const selectedFolderId = ref(null)//null=默认收藏夹
+const newFolderName = ref('')
+const creatingFolder = ref(false)
+
+const confirmFavorite = async () => {
+    favoriteCount.value = (await articleFavoriteService(noteId, selectedFolderId.value || undefined)).data
+    favorited.value = true
+    const name = favoriteFolders.value.find(f => f.id === selectedFolderId.value)?.name || '默认收藏夹'
+    ElMessage.success(`已收藏到「${name}」`)
+    favoriteDialog.value = false
+}
+
+const createFolderInline = async () => {
+    const name = newFolderName.value.trim()
+    if (!name) {
+        ElMessage.warning('请输入收藏夹名称')
+        return
+    }
+    creatingFolder.value = true
+    try {
+        await createFavoriteFolderService(name)
+        const res = await myFavoriteFoldersService()
+        favoriteFolders.value = res.data || []
+        selectedFolderId.value = favoriteFolders.value.find(f => f.name === name)?.id || null
+        newFolderName.value = ''
+        ElMessage.success('收藏夹已创建')
+    } finally {
+        creatingFolder.value = false
     }
 }
 
@@ -106,10 +175,12 @@ onMounted(() => {
                 <!-- 标题与作者 -->
                 <h1 class="detail-title">{{ article.title }}</h1>
                 <div class="detail-meta">
-                    <el-avatar :size="32" :src="article.authorAvatar">
+                    <el-avatar :size="32" :src="article.authorAvatar" style="cursor: pointer"
+                        @click="router.push(`/user/homepage/${article.authorId}`)">
                         {{ article.authorName?.charAt(0) }}
                     </el-avatar>
-                    <span class="author">{{ article.authorName }}</span>
+                    <span class="author" style="cursor: pointer"
+                        @click="router.push(`/user/homepage/${article.authorId}`)">{{ article.authorName }}</span>
                     <span class="time">{{ article.createTime }}</span>
                     <span class="view">👁 {{ article.viewCount || 0 }} 次浏览</span>
                     <!-- 作者认证店铺：点击进店看全部商品 -->
@@ -157,6 +228,7 @@ onMounted(() => {
                     <el-button
                         :type="liked ? 'danger' : 'default'"
                         round
+                        :loading="likePending"
                         @click="toggleLike"
                     >
                         {{ liked ? '❤️ 已点赞' : '🤍 点赞' }} {{ likeCount || 0 }}
@@ -179,6 +251,25 @@ onMounted(() => {
 
         <!-- 评论区（文章笔记评论：点赞/回复/按时间与点赞排序） -->
         <CommentSection v-if="article.noteId" target-type="article" :target-id="Number(noteId)" />
+
+        <!-- 收藏夹选择弹窗（有自定义收藏夹时收藏先选夹） -->
+        <el-dialog v-model="favoriteDialog" title="收藏到" width="420px">
+            <el-radio-group v-model="selectedFolderId" class="folder-group">
+                <el-radio v-for="f in favoriteFolders" :key="f.id ?? 'default'" :value="f.id" class="folder-radio">
+                    📁 {{ f.name }}
+                    <span class="folder-count">{{ f.articleCount }} 篇</span>
+                </el-radio>
+            </el-radio-group>
+            <div class="new-folder">
+                <el-input v-model="newFolderName" size="small" maxlength="30" placeholder="新建收藏夹名称"
+                    @keyup.enter="createFolderInline" />
+                <el-button size="small" :loading="creatingFolder" @click="createFolderInline">新建</el-button>
+            </div>
+            <template #footer>
+                <el-button @click="favoriteDialog = false">取消</el-button>
+                <el-button type="primary" @click="confirmFavorite">收藏</el-button>
+            </template>
+        </el-dialog>
 
         <!-- 转发好友选择弹窗 -->
         <el-dialog v-model="forwardVisible" title="转发给好友" width="400px">
@@ -298,6 +389,31 @@ onMounted(() => {
         display: flex;
         align-items: center;
         gap: 8px;
+    }
+    .folder-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 100%;
+        .folder-radio {
+            height: auto;
+            padding: 8px 12px;
+            margin-right: 0;
+            border: 1px solid #ebeef5;
+            border-radius: 8px;
+            .folder-count {
+                color: #bbb;
+                font-size: 12px;
+                margin-left: 6px;
+            }
+        }
+    }
+    .new-folder {
+        display: flex;
+        gap: 8px;
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px dashed #ebeef5;
     }
 }
 </style>

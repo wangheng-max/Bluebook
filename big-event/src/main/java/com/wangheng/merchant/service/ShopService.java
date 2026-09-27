@@ -6,18 +6,6 @@ import com.wangheng.merchant.pojo.ShopVO;
 import com.wangheng.product.pojo.Product;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * 店铺主页服务（公开：店铺信息 / 在架商品 / 评价列表）。
  */

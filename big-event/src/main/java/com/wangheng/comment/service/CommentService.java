@@ -5,15 +5,6 @@ import com.wangheng.comment.pojo.CommentVO;
 import com.wangheng.common.PageBean;
 
 
-
-
-
-
-
-
-
-
-
 /**
  * 评论服务（文章/商品通用）：发布、回复、点赞、按时间/点赞排序的分页查询
  */
@@ -36,4 +27,9 @@ public interface CommentService {
 
     /** 删除自己的评论（顶级评论连带全部回复） */
     void delete(Integer commentId, Integer userId);
+
+    /**
+     * 商品评分统计（平均分 + 评分人数，仅统计带分的顶级评论）
+     */
+    java.util.Map<String, Object> stats(String targetType, Integer targetId);
 }

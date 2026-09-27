@@ -1,12 +1,7 @@
 package com.wangheng.coupon.mapper;
 
 import com.wangheng.coupon.pojo.CouponStock;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -14,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import java.util.List;
+
 
 /**
  * 优惠券库存（发放活动）表 Mapper。

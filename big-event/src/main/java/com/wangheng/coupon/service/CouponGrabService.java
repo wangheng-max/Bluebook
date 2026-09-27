@@ -12,6 +12,7 @@ import com.wangheng.coupon.pojo.CouponGrabResult;
 
 
 
+
 /**
  * 抢券服务（秒杀抢券核心，设计文档《秒杀抢券高并发方案》）。
  * Redis Lua 原子扣减 + 唯一索引兜底 + 幂等占坑（Controller 层）。

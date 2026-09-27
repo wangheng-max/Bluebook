@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+
 /**
  * 收货地址添加/修改参数（POST/PUT /user/address）。
  * id 在修改时必传，添加时忽略。

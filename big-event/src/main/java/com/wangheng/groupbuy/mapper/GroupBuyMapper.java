@@ -1,12 +1,7 @@
 package com.wangheng.groupbuy.mapper;
 
 import com.wangheng.groupbuy.pojo.GroupBuy;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -14,7 +9,13 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import java.util.List;
+
+
+
+
+
+
+
 
 /**
  * 团购活动表 Mapper。

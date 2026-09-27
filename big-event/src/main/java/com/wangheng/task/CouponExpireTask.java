@@ -1,16 +1,17 @@
 package com.wangheng.task;
 
 import com.wangheng.coupon.mapper.UserCouponMapper;
-
-
-
-
-
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+
+
+
+
+
+
 
 /**
  * 优惠券过期检查（设计文档《定时任务设计》）：每小时批量标记过期券。

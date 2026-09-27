@@ -4,27 +4,13 @@ import com.wangheng.address.mapper.UserAddressMapper;
 import com.wangheng.address.pojo.AddressSaveDTO;
 import com.wangheng.address.pojo.UserAddress;
 import com.wangheng.address.service.UserAddressService;
-
-
-
-
-
-
-
-
-
 import com.wangheng.exception.MerchantAuthException;
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 收货地址服务实现（数据隔离：只能操作自己的地址）。

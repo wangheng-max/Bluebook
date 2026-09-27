@@ -1,5 +1,7 @@
 package com.wangheng.product.controller;
 
+import com.wangheng.anno.RequireAdmin;
+import com.wangheng.anno.RequireMerchant;
 import com.wangheng.article.pojo.CategorySaveDTO;
 import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
@@ -10,29 +12,8 @@ import com.wangheng.product.pojo.ProductSaveDTO;
 import com.wangheng.product.pojo.ProductSku;
 import com.wangheng.product.service.ProductCategoryService;
 import com.wangheng.product.service.ProductService;
-
-
-
-
-
-
-
-
-
-
-
-import com.wangheng.anno.RequireAdmin;
-import com.wangheng.anno.RequireMerchant;
-
-
-
-
-
-
-
-
-
-
+import java.math.BigDecimal;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,9 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * 商品接口（商城团购功能）。

@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
 /**
  * 商家权限注解（v1.1 商家认证机制）。
  * 标注在商家经营接口（类或方法）上，由 RoleAuthAspect 切面校验：

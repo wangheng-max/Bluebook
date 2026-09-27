@@ -3,9 +3,10 @@ package com.wangheng.coupon.pojo;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import lombok.Data;
 
-import java.math.BigDecimal;
+
 
 /**
  * 优惠券类型创建/修改参数（POST /merchant/coupon/type、PUT /merchant/coupon/type/{id}，商家接口）。

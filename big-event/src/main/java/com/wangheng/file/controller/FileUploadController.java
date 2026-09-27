@@ -1,19 +1,13 @@
 package com.wangheng.file.controller;
 
 import com.wangheng.common.Result;
-
-
-
-
-
-
 import com.wangheng.utils.AliOssUtil;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
 
 @RestController
 public class FileUploadController {

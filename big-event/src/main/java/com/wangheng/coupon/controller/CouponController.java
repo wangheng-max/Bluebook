@@ -5,28 +5,15 @@ import com.wangheng.common.Result;
 import com.wangheng.coupon.pojo.CouponType;
 import com.wangheng.coupon.pojo.UserCouponVO;
 import com.wangheng.coupon.service.CouponService;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import java.math.BigDecimal;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.List;
+
 
 /**
  * 优惠券接口（用户视角）。

@@ -1,19 +1,12 @@
 package com.wangheng.product.mapper;
 
 import com.wangheng.product.pojo.ProductCategory;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import java.util.List;
 
 /**
  * 商品分类表 Mapper（管理员维护）

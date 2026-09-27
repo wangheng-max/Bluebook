@@ -1,40 +1,24 @@
 package com.wangheng.comment.service.impl;
 
 import com.wangheng.article.mapper.ArticleMapper;
+import com.wangheng.article.util.NoteVOConverter;
 import com.wangheng.comment.mapper.CommentMapper;
 import com.wangheng.comment.pojo.Comment;
 import com.wangheng.comment.pojo.CommentSaveDTO;
 import com.wangheng.comment.pojo.CommentVO;
 import com.wangheng.comment.service.CommentService;
 import com.wangheng.common.PageBean;
+import com.wangheng.order.mapper.OrderItemMapper;
+import com.wangheng.order.pojo.OrderItem;
+import com.wangheng.order.mapper.OrderMapper;
 import com.wangheng.product.mapper.ProductMapper;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import java.util.*;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -48,6 +32,12 @@ public class CommentServiceImpl implements CommentService {
     private ArticleMapper articleMapper;
     @Autowired
     private ProductMapper productMapper;
+    @Autowired
+    private OrderMapper orderMapper;
+    @Autowired
+    private OrderItemMapper orderItemMapper;
+    @Autowired
+    private com.wangheng.merchant.mapper.MerchantRatingMapper merchantRatingMapper;
 
     @Override
     public void add(CommentSaveDTO dto, Integer userId) {
@@ -58,6 +48,22 @@ public class CommentServiceImpl implements CommentService {
         comment.setTargetId(dto.getTargetId());
         comment.setUserId(userId);
         comment.setContent(dto.getContent().trim());
+
+        // 商品顶级评论：评分 + 晒图 + 晒单（回复不支持）
+        boolean topLevel = dto.getParentId() == null || dto.getParentId() <= 0;
+        if ("product".equals(dto.getTargetType()) && topLevel) {
+            comment.setScore(dto.getScore());
+            if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+                comment.setImages(String.join(",", dto.getImages()));
+            }
+            if (dto.getOrderId() != null) {
+                // 晒单校验：必须是自己的、已支付及之后状态、且包含该商品的订单
+                if (orderMapper.countOwnPaidOrderWithProduct(dto.getOrderId(), userId, dto.getTargetId()) == 0) {
+                    throw new RuntimeException("只能关联自己购买该商品的订单");
+                }
+                comment.setOrderId(dto.getOrderId());
+            }
+        }
 
         if (dto.getParentId() == null || dto.getParentId() <= 0) {
             // 顶级评论
@@ -107,6 +113,8 @@ public class CommentServiceImpl implements CommentService {
         }
 
         markLikedStatus(roots, repliesByRoot);
+        fillProductExtras(roots);
+        fillProductExtras(allReplies);
         return new PageBean<>(total, roots);
     }
 
@@ -122,6 +130,7 @@ public class CommentServiceImpl implements CommentService {
         }
         List<CommentVO> items = commentMapper.pageReplies(rootId, (pageNum - 1) * pageSize, pageSize);
         markLikedStatus(new ArrayList<>(), Map.of(rootId, new ArrayList<>(items)));
+        fillProductExtras(items);
         return new PageBean<>(total, items);
     }
 
@@ -162,6 +171,40 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    /** 商品评论扩展装配：解析晒图列表 + 批量回填已购快照文本 */
+    private void fillProductExtras(List<CommentVO> vos) {
+        if (vos == null || vos.isEmpty()) {
+            return;
+        }
+        List<Integer> orderIds = vos.stream().filter(v -> v.getOrderId() != null)
+                .map(CommentVO::getOrderId).distinct().collect(Collectors.toList());
+        Map<Integer, String> snapshots = orderIds.isEmpty() ? Map.of()
+                : orderItemMapper.findByOrderIds(orderIds).stream()
+                        .collect(Collectors.toMap(OrderItem::getOrderId, oi -> {
+                            String spec = oi.getSkuName() == null || oi.getSkuName().isBlank() ? ""
+                                    : " 规格：" + oi.getSkuName();
+                            return "已购「" + oi.getProductName() + "」" + spec;
+                        }, (a, b) -> a));
+        for (CommentVO vo : vos) {
+            if (vo.getImagesJson() != null && !vo.getImagesJson().isBlank()) {
+                vo.setImages(NoteVOConverter.splitCsv(vo.getImagesJson()));
+                vo.setImagesJson(null);
+            }
+            if (vo.getOrderId() != null) {
+                vo.setPurchasedText(snapshots.get(vo.getOrderId()));
+            }
+        }
+    }
+
+    @Override
+    public Map<String, Object> stats(String targetType, Integer targetId) {
+        Double avg = commentMapper.avgScore(targetType, targetId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("avgScore", avg == null ? null : Math.round(avg * 10) / 10.0);
+        result.put("scoreCount", commentMapper.countScored(targetType, targetId));
+        return result;
+    }
+
     /** 给本页展示的评论（含楼中楼预览）打上当前用户的点赞状态；匿名访问全部为 false */
     private void markLikedStatus(List<CommentVO> roots, Map<Integer, List<CommentVO>> repliesByRoot) {
         Integer userId = currentUserId();
@@ -187,6 +230,11 @@ public class CommentServiceImpl implements CommentService {
         } else if ("product".equals(targetType)) {
             if (productMapper.findById(targetId) == null) {
                 throw new RuntimeException("评论的商品不存在");
+            }
+        } else if ("rating".equals(targetType)) {
+            // 商家评价也可被评论（店铺页评价展开评论区）
+            if (merchantRatingMapper.countById(targetId) == 0) {
+                throw new RuntimeException("评论的评价不存在");
             }
         } else {
             throw new RuntimeException("评论目标类型不合法");

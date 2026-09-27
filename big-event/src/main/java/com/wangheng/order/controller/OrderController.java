@@ -1,31 +1,18 @@
 package com.wangheng.order.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
 import com.wangheng.order.pojo.OrderCreateDTO;
+import com.wangheng.order.pojo.OrderItem;
 import com.wangheng.order.pojo.OrderVO;
 import com.wangheng.order.pojo.PayDTO;
 import com.wangheng.order.pojo.RefundApplyDTO;
 import com.wangheng.order.pojo.RefundOrderVO;
 import com.wangheng.order.service.OrderService;
-
-
-
-
-
-
-
-
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-
-
-
-
-
-
-
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
@@ -39,9 +26,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 订单接口（商城团购功能）。
@@ -150,5 +134,11 @@ public class OrderController {
     public Result refund(@PathVariable Integer id, @RequestBody RefundApplyDTO dto) {
         orderService.applyRefund(id, dto);
         return Result.success();
+    }
+
+    /** 我购买某商品的订单明细（商品评论晒单：自动带上买了什么） */
+    @GetMapping("/purchased")
+    public Result<List<OrderItem>> purchased(@RequestParam Integer productId) {
+        return Result.success(orderService.myPurchasedItems(productId));
     }
 }

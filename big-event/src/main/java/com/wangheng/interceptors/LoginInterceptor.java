@@ -4,6 +4,9 @@ import com.wangheng.utils.JwtUtil;
 import com.wangheng.utils.ThreadLocalUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -11,9 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
+
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
@@ -40,6 +41,9 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     /** 店铺主页公开读接口（店铺信息/在架商品/评价列表，内容电商 v1.2） */
     private static final Pattern PUBLIC_SHOP_PATH = Pattern.compile("^/shop/\\d+(/(products|ratings))?$");
+
+    /** 社交公开读接口（博主主页/关注状态/评论评分统计/作者作品列表） */
+    private static final Pattern PUBLIC_SOCIAL_PATH = Pattern.compile("^(/user/homepage/\\d+|/follow/status|/comment/stats|/community/user/\\d+/articles)$");
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -101,7 +105,8 @@ public class LoginInterceptor implements HandlerInterceptor {
                 || PUBLIC_MALL_ID_PATH.matcher(path).matches()
                 || PUBLIC_MALL_SKU_PATH.matcher(path).matches()
                 || PUBLIC_COMMENT_REPLY_PATH.matcher(path).matches()
-                || PUBLIC_SHOP_PATH.matcher(path).matches();
+                || PUBLIC_SHOP_PATH.matcher(path).matches()
+                || PUBLIC_SOCIAL_PATH.matcher(path).matches();
     }
 
     @Override

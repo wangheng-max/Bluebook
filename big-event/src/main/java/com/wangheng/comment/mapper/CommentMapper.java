@@ -2,16 +2,11 @@ package com.wangheng.comment.mapper;
 
 import com.wangheng.comment.pojo.Comment;
 import com.wangheng.comment.pojo.CommentVO;
-
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.*;
 
-import java.util.List;
+
+
 
 /**
  * 评论模块 Mapper（文章/商品通用评论 + 评论点赞）
@@ -19,8 +14,8 @@ import java.util.List;
 @Mapper
 public interface CommentMapper {
 
-    @Insert("insert into comment(target_type, target_id, user_id, content, parent_id, root_id, reply_user_id, create_time, update_time) " +
-            "values(#{targetType}, #{targetId}, #{userId}, #{content}, #{parentId}, #{rootId}, #{replyUserId}, now(), now())")
+    @Insert("insert into comment(target_type, target_id, user_id, content, parent_id, root_id, reply_user_id, score, images, order_id, create_time, update_time) " +
+            "values(#{targetType}, #{targetId}, #{userId}, #{content}, #{parentId}, #{rootId}, #{replyUserId}, #{score}, #{images}, #{orderId}, now(), now())")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insert(Comment comment);
 
@@ -37,6 +32,7 @@ public interface CommentMapper {
     @Select("<script>" +
             "select c.id, c.target_type as targetType, c.target_id as targetId, c.user_id as userId, c.content, " +
             "c.parent_id as parentId, c.root_id as rootId, c.reply_user_id as replyUserId, c.like_count as likeCount, " +
+            "c.score as score, c.images as imagesJson, c.order_id as orderId, " +
             "c.create_time as createTime, u.nickname, u.user_pic as userPic " +
             "from comment c left join user u on c.user_id = u.id " +
             "where c.target_type=#{targetType} and c.target_id=#{targetId} and c.parent_id=0 " +
@@ -53,6 +49,7 @@ public interface CommentMapper {
     @Select("<script>" +
             "select c.id, c.target_type as targetType, c.target_id as targetId, c.user_id as userId, c.content, " +
             "c.parent_id as parentId, c.root_id as rootId, c.reply_user_id as replyUserId, c.like_count as likeCount, " +
+            "c.score as score, c.images as imagesJson, c.order_id as orderId, " +
             "c.create_time as createTime, u.nickname, u.user_pic as userPic, ru.nickname as replyNickname " +
             "from comment c " +
             "left join user u on c.user_id = u.id " +
@@ -66,6 +63,7 @@ public interface CommentMapper {
     /** 某顶级评论的回复分页（按时间正序，符合会话阅读顺序） */
     @Select("select c.id, c.target_type as targetType, c.target_id as targetId, c.user_id as userId, c.content, " +
             "c.parent_id as parentId, c.root_id as rootId, c.reply_user_id as replyUserId, c.like_count as likeCount, " +
+            "c.score as score, c.images as imagesJson, c.order_id as orderId, " +
             "c.create_time as createTime, u.nickname, u.user_pic as userPic, ru.nickname as replyNickname " +
             "from comment c " +
             "left join user u on c.user_id = u.id " +
@@ -113,4 +111,12 @@ public interface CommentMapper {
             "<foreach collection='commentIds' item='cid' open='(' separator=',' close=')'>#{cid}</foreach>" +
             "</script>")
     void deleteLikesByCommentIds(@Param("commentIds") List<Integer> commentIds);
+
+    /** 商品平均评分（只统计带分的顶级评论，无评分时 null） */
+    @Select("select avg(score) from comment where target_type=#{targetType} and target_id=#{targetId} and score is not null")
+    Double avgScore(@Param("targetType") String targetType, @Param("targetId") Integer targetId);
+
+    /** 商品评分人数 */
+    @Select("select count(*) from comment where target_type=#{targetType} and target_id=#{targetId} and score is not null")
+    int countScored(@Param("targetType") String targetType, @Param("targetId") Integer targetId);
 }

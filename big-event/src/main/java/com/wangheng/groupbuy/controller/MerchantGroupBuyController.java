@@ -1,28 +1,16 @@
 package com.wangheng.groupbuy.controller;
 
+import com.wangheng.anno.RequireMerchant;
 import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
 import com.wangheng.groupbuy.pojo.GroupBuy;
 import com.wangheng.groupbuy.service.GroupBuyService;
-
-
-
-
-
-
-
-
-
-import com.wangheng.anno.RequireMerchant;
-
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * 商家团购管理接口（商城团购功能，仅认证商家）。

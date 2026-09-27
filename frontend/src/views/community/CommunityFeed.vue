@@ -1,13 +1,16 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { searchNotesService, searchNotesByTagService } from '@/api/search.js'
 import { communityHotService, communityArticlesService } from '@/api/community.js'
-import { articleCategoryListService } from '@/api/article.js'
+import { articleCategoryListService, articleLikeService, articleUnlikeService } from '@/api/article.js'
 import { useRouter } from 'vue-router'
+import useUserInfoStore from '@/stores/userInfo.js'
 
 const router = useRouter()
 const route = useRoute()
+const userInfoStore = useUserInfoStore()
 
 const keyword = ref('')
 const articles = ref([])
@@ -114,6 +117,33 @@ const onPageChange = (num) => {
     loadList()
 }
 
+//卡片点赞：与详情页同一套接口；乐观更新失败回滚，请求锁防连点
+const likePendingIds = new Set()
+const toggleCardLike = async (article) => {
+    if (!userInfoStore.info?.id) {
+        ElMessage.warning('请先登录后点赞')
+        router.push('/login')
+        return
+    }
+    if (likePendingIds.has(article.noteId)) return
+    likePendingIds.add(article.noteId)
+    const prevLiked = !!article.liked
+    const prevCount = Number(article.likeCount || 0)
+    article.liked = !prevLiked
+    article.likeCount = prevCount + (prevLiked ? -1 : 1)
+    try {
+        const result = prevLiked
+            ? await articleUnlikeService(article.noteId)
+            : await articleLikeService(article.noteId)
+        if (result.data != null) article.likeCount = Number(result.data)
+    } catch (e) {
+        article.liked = prevLiked
+        article.likeCount = prevCount
+    } finally {
+        likePendingIds.delete(article.noteId)
+    }
+}
+
 const onSizeChange = (size) => {
     pageSize.value = size
     pageNum.value = 1
@@ -217,7 +247,7 @@ loadCategories()
                     </div>
 
                     <div class="article-meta">
-                        <div class="author-info">
+                        <div class="author-info" @click.stop="router.push(`/user/homepage/${article.authorId}`)">
                             <el-avatar :size="24" :src="article.authorAvatar">
                                 {{ article.authorName?.charAt(0) }}
                             </el-avatar>
@@ -225,7 +255,11 @@ loadCategories()
                         </div>
                         <div class="stats">
                             <span>👁 {{ article.viewCount || 0 }}</span>
-                            <span>❤️ {{ article.likeCount || 0 }}</span>
+                            <span :class="['like-chip', { liked: article.liked }]"
+                                @click.stop="toggleCardLike(article)"
+                                :title="article.liked ? '取消点赞' : '点赞'">
+                                {{ article.liked ? '❤️' : '🤍' }} {{ article.likeCount || 0 }}
+                            </span>
                             <span>⭐ {{ article.favoriteCount || 0 }}</span>
                             <span class="time">{{ formatDate(article.createTime) }}</span>
                         </div>
@@ -380,6 +414,15 @@ function formatDate(dateStr) {
                     font-size: 12px;
                     color: #999;
                     .time { color: #bbb; }
+
+                    // 卡片点赞入口：与详情页同一套接口
+                    .like-chip {
+                        cursor: pointer;
+                        user-select: none;
+
+                        &:hover { color: #f56c6c; }
+                        &.liked { color: #f56c6c; }
+                    }
                 }
             }
         }

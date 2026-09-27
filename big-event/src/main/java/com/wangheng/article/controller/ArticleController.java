@@ -4,22 +4,10 @@ import com.wangheng.article.pojo.Article;
 import com.wangheng.article.service.ArticleService;
 import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
-
-
-
-
-
-
-
-
-
-
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 
 
 @RestController

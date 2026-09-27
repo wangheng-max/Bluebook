@@ -5,15 +5,6 @@ import com.wangheng.friend.pojo.FriendRequestVO;
 import com.wangheng.friend.pojo.FriendVO;
 
 
-
-
-
-
-
-
-
-
-
 public interface FriendService {
 
     // 发送好友请求

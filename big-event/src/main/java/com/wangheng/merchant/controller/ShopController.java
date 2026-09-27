@@ -6,29 +6,13 @@ import com.wangheng.merchant.pojo.MerchantRatingVO;
 import com.wangheng.merchant.pojo.ShopVO;
 import com.wangheng.merchant.service.ShopService;
 import com.wangheng.product.pojo.Product;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * 店铺主页公开接口（匿名可访问，白名单见 LoginInterceptor ^/shop/\d+...）。

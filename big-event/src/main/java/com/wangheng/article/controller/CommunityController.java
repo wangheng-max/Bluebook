@@ -4,21 +4,10 @@ import com.wangheng.article.pojo.NoteSearchVO;
 import com.wangheng.article.service.CommunityService;
 import com.wangheng.common.PageBean;
 import com.wangheng.common.Result;
-
-
-
-
-
-
-
-
-
-
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+
 
 @RestController
 @RequestMapping("/community")
@@ -54,6 +43,16 @@ public class CommunityController {
     @GetMapping("/article/{id}")
     public Result<NoteSearchVO> detail(@PathVariable Integer id) {
         return Result.success(communityService.articleDetail(id));
+    }
+
+    /**
+     * 某作者的已发布文章（博主主页作品列表，公开）
+     */
+    @GetMapping("/user/{userId}/articles")
+    public Result<PageBean<NoteSearchVO>> userArticles(@PathVariable Integer userId,
+                                                       @RequestParam(defaultValue = "1") Integer pageNum,
+                                                       @RequestParam(defaultValue = "10") Integer pageSize) {
+        return Result.success(communityService.articlesByUser(userId, pageNum, pageSize));
     }
 
     /**

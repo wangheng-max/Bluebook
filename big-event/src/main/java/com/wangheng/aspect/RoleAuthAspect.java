@@ -7,6 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
 /**
  * 角色权限切面（v1.1 商家认证机制）。
  * @RequireMerchant：校验认证通过的商家；@RequireAdmin：校验管理员。

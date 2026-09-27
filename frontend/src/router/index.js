@@ -11,6 +11,7 @@ import ArticleManageVue from '@/views/article/ArticleManage.vue'
 import UserAvatarVue from '@/views/user/UserAvatar.vue'
 import UserInfoVue from '@/views/user/UserInfo.vue'
 import UserResetPasswordVue from '@/views/user/UserResetPassword.vue'
+import UserHomepageVue from '@/views/user/UserHomepage.vue'
 
 // 社区 & 好友模块
 import CommunityFeedVue from '@/views/community/CommunityFeed.vue'
@@ -84,6 +85,7 @@ const routes = [
             { path: '/admin/product-categories', component: AdminProductCategoryVue },
             // 个人中心
             { path: '/user/address', component: UserAddressVue },
+            { path: '/user/homepage/:userId', component: UserHomepageVue },
             { path: '/user/info', component: UserInfoVue },
             { path: '/user/avatar', component: UserAvatarVue },
             { path: '/user/resetPassword', component: UserResetPasswordVue }

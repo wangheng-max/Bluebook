@@ -1,19 +1,20 @@
 package com.wangheng.product.pojo;
 
-
-
-
-
-
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.Data;
+
+
+
+
+
+
+
+
 
 /**
  * 商品 SKU 发布/修改参数（ProductSaveDTO.skuList 的元素）

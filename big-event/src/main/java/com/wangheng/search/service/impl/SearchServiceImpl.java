@@ -1,5 +1,7 @@
 package com.wangheng.search.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.wangheng.article.mapper.ArticleMapper;
 import com.wangheng.article.pojo.Article;
 import com.wangheng.article.pojo.NoteSearchVO;
@@ -11,46 +13,12 @@ import com.wangheng.search.service.SearchCacheService;
 import com.wangheng.search.service.SearchService;
 import com.wangheng.user.mapper.UserMapper;
 import com.wangheng.user.pojo.User;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-
-
-
-
-
-
 import com.wangheng.utils.ThreadLocalUtil;
-
-
-
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SearchServiceImpl implements SearchService {

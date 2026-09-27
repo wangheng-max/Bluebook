@@ -3,6 +3,7 @@ package com.wangheng.merchant.pojo;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+
 /**
  * 店铺信息修改参数（PUT /merchant/info）：店名、头像、描述
  */

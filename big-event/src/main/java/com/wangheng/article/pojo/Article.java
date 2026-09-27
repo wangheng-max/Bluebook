@@ -1,14 +1,15 @@
 package com.wangheng.article.pojo;
 
-
 import com.wangheng.anno.State;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
-import java.time.LocalDateTime;
+
+
 @Data
 public class Article {
     private Integer id;//主键ID

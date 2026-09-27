@@ -1,12 +1,7 @@
 package com.wangheng.address.mapper;
 
 import com.wangheng.address.pojo.UserAddress;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,7 +10,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import java.util.List;
 
 /**
  * 收货地址表 Mapper（数据隔离：全部操作带 userId 条件）

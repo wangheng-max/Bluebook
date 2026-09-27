@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
 /**
  * 管理员权限注解（v1.1 商家认证机制）。
  * 标注在管理员接口（如商家审核/封禁）上，由 RoleAuthAspect 切面校验

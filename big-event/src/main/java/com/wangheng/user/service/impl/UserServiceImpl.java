@@ -3,25 +3,12 @@ package com.wangheng.user.service.impl;
 import com.wangheng.user.mapper.UserMapper;
 import com.wangheng.user.pojo.User;
 import com.wangheng.user.service.UserService;
-
-
-
-
-
-
-
-
-
-
-
-
 import com.wangheng.utils.Md5Util;
 import com.wangheng.utils.ThreadLocalUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -62,4 +49,14 @@ public class UserServiceImpl implements UserService {
     }
 
 
+
+    @Override
+    public User findById(Integer id) {
+        return userMapper.findById(id);
+    }
+
+    @Override
+    public void updateBio(Integer userId, String bio) {
+        userMapper.updateBio(bio, userId);
+    }
 }

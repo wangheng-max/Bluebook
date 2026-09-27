@@ -1,18 +1,19 @@
 package com.wangheng.order.mapper;
 
 import com.wangheng.order.pojo.OrderItem;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.List;
+
+
+
+
+
+
+
 
 /**
  * 订单明细表 Mapper。
@@ -34,4 +35,12 @@ public interface OrderItemMapper {
     @Select("select count(*) from order_item oi join product p on oi.product_id=p.id " +
             "where oi.order_id=#{orderId} and p.create_user_id=#{userId}")
     int countByOrderAndMerchant(@Param("orderId") Integer orderId, @Param("userId") Integer userId);
+
+    /** 批量按订单ID查明细（商品评论"已购快照"展示用） */
+    @Select("<script>" +
+            "select * from order_item where order_id in " +
+            "<foreach collection='orderIds' item='oid' open='(' separator=',' close=')'>#{oid}</foreach>" +
+            " order by id asc" +
+            "</script>")
+    List<OrderItem> findByOrderIds(@Param("orderIds") List<Integer> orderIds);
 }

@@ -3,25 +3,26 @@ package com.wangheng.task;
 import com.wangheng.article.mapper.ArticleMapper;
 import com.wangheng.article.mapper.InteractionMapper;
 import com.wangheng.article.pojo.Article;
-
-
-
-
-
-
-
-
-
-
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * 缓存一致性定时任务（文档第7.2/7.3节）：
@@ -34,8 +35,8 @@ public class DataSyncTask {
 
     private static final String HOT_KEY = "hot:articles";
     private static final String VIEW_KEY_PREFIX = "article:view:";
-    private static final String LIKE_KEY_PREFIX = "article:like:";
-    private static final String FAV_KEY_PREFIX = "article:fav:";
+    private static final String LIKE_KEY_PREFIX = com.wangheng.article.util.InteractionRedisKeys.LIKE_KEY_PREFIX;
+    private static final String FAV_KEY_PREFIX = com.wangheng.article.util.InteractionRedisKeys.FAV_KEY_PREFIX;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -114,7 +115,7 @@ public class DataSyncTask {
                                     interactionMapper.deleteFavAll(aid);
                                 } else {
                                     for (Integer uid : userIds) {
-                                        interactionMapper.insertFavorite(aid, uid);
+                                        interactionMapper.insertFavorite(aid, uid, null); // 对账回写归默认收藏夹
                                     }
                                     interactionMapper.deleteFavNotIn(aid, userIds);
                                 }

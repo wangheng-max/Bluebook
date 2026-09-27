@@ -3,17 +3,6 @@ package com.wangheng.product.service;
 import com.wangheng.article.pojo.CategorySaveDTO;
 import com.wangheng.product.pojo.ProductCategory;
 import com.wangheng.product.pojo.ProductCategoryVO;
-
-
-
-
-
-
-
-
-
-
-
 import java.util.List;
 
 /**

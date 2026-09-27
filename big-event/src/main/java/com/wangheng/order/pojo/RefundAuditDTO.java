@@ -3,6 +3,7 @@ package com.wangheng.order.pojo;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+
 /**
  * 商家退款审核参数（POST /merchant/refund/{id}/audit）
  */

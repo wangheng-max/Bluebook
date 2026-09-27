@@ -1,17 +1,18 @@
 package com.wangheng.order.pojo;
 
-
-
-
-
-
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Data;
 
-import java.util.List;
+
+
+
+
+
+
+
 
 /**
  * 创建订单参数（POST /order）。

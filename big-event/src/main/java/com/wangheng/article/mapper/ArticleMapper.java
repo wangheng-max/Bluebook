@@ -1,18 +1,19 @@
 package com.wangheng.article.mapper;
 
 import com.wangheng.article.pojo.Article;
-
-
-
-
-
-
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.List;
+
+
+
+
+
+
+
 
 @Mapper
 public interface ArticleMapper {
@@ -47,6 +48,14 @@ public interface ArticleMapper {
     //全部已发布文章（热度定时重算用）
     @Select("select * from article where state = '已发布'")
     List<Article> findAllPublished();
+
+    //某作者已发布文章数（博主主页"作品"数）
+    @Select("select count(*) from article where state = '已发布' and create_user = #{userId}")
+    int countPublishedByUser(Integer userId);
+
+    //某作者的已发布文章（博主主页作品列表，PageHelper 分页）
+    @Select("select * from article where state = '已发布' and create_user = #{userId} order by create_time desc, id desc")
+    java.util.List<Article> listPublishedByUser(Integer userId);
 
     //近期已发布文章的标签列（热门标签统计用，轻量查询）
     @Select("select tags from article where state = '已发布' and tags is not null order by create_time desc limit 1000")

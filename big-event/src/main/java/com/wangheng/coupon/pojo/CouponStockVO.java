@@ -1,10 +1,11 @@
 package com.wangheng.coupon.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Data;
+
+
 
 /**
  * 抢购活动返回对象（GET /coupon/stock/list、GET /coupon/stock/{id}）：
