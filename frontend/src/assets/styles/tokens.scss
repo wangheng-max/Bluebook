@@ -1,0 +1,50 @@
+// ==========================================
+// 小蓝书设计系统 Token（参考 tduck 飞书蓝规范）
+// ==========================================
+
+// 1. 品牌主色（飞书蓝 Lark Blue）
+$color-primary: #3370ff;
+$color-primary-hover: #5a8fec;
+$color-primary-active: #275ccb;
+$color-primary-light: #ebf2ff;
+
+// 2. 功能色
+$color-success: #34c759;
+$color-warning: #ff9500;
+$color-danger: #ff3b30;
+$color-info: #8f959e;
+
+// 3. 中性色阶
+$text-primary: #1f2329;
+$text-regular: #646a73;
+$text-secondary: #8f959e;
+$text-placeholder: #bbbfc4;
+
+// 4. 边框与背景
+$border-color-base: #dee0e3;
+$border-color-light: #ebeeef;
+$border-color-lighter: #f2f3f5;
+$bg-color-base: #fafbfc;
+$bg-color-container: #ffffff;
+$bg-color-hover: #f5f6f7;
+
+// 5. 圆角体系
+$radius-small: 6px;
+$radius-base: 8px;
+$radius-medium: 10px;
+$radius-large: 12px;
+$radius-hero: 24px;
+
+// 6. 空气感投影
+$shadow-card: 0 4px 12px 0 rgba(31, 35, 41, 0.04);
+$shadow-card-hover: 0 6px 18px 0 rgba(31, 35, 41, 0.08);
+$shadow-popup: 0 8px 24px 0 rgba(31, 35, 41, 0.08);
+$shadow-hero: 0 28px 60px rgba(31, 35, 41, 0.06), 0 10px 22px rgba(31, 35, 41, 0.02);
+
+// 7. 动效
+$transition-base: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+$transition-fast: all 0.15s linear;
+
+// 8. 字体栈
+$font-family-base: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;

@@ -1,0 +1,244 @@
+// ==========================================
+// Element Plus 深度覆写：飞书蓝极简大厂风
+// ==========================================
+@use './tokens.scss' as *;
+
+:root {
+    // 品牌色（light-N = 与白色按比例混合，dark-2 = 20% 黑）
+    --el-color-primary: #{$color-primary};
+    --el-color-primary-light-3: #709bff;
+    --el-color-primary-light-5: #99b8ff;
+    --el-color-primary-light-7: #c2d4ff;
+    --el-color-primary-light-8: #d6e2ff;
+    --el-color-primary-light-9: #ebf1ff;
+    --el-color-primary-dark-2: #295acc;
+
+    --el-color-success: #{$color-success};
+    --el-color-success-light-3: #71d88b;
+    --el-color-success-light-5: #9ae3ac;
+    --el-color-success-light-7: #c2eecd;
+    --el-color-success-light-8: #d6f4de;
+    --el-color-success-light-9: #ebf9ee;
+    --el-color-success-dark-2: #2a9f47;
+
+    --el-color-warning: #{$color-warning};
+    --el-color-warning-light-3: #ffb54c;
+    --el-color-warning-light-5: #ffca7f;
+    --el-color-warning-light-7: #ffdfb2;
+    --el-color-warning-light-8: #ffeacc;
+    --el-color-warning-light-9: #fff4e5;
+    --el-color-warning-dark-2: #cc7700;
+
+    --el-color-danger: #{$color-danger};
+    --el-color-danger-light-3: #ff766e;
+    --el-color-danger-light-5: #ff9d98;
+    --el-color-danger-light-7: #ffc4c1;
+    --el-color-danger-light-8: #ffd8d6;
+    --el-color-danger-light-9: #ffebea;
+    --el-color-danger-dark-2: #cc2f26;
+
+    --el-color-error: #{$color-danger};
+    --el-color-error-light-3: #ff766e;
+    --el-color-error-light-5: #ff9d98;
+    --el-color-error-light-7: #ffc4c1;
+    --el-color-error-light-8: #ffd8d6;
+    --el-color-error-light-9: #ffebea;
+    --el-color-error-dark-2: #cc2f26;
+
+    --el-color-info: #{$color-info};
+    --el-color-info-light-3: #b1b6bf;
+    --el-color-info-light-5: #c7cacf;
+    --el-color-info-light-7: #dddfe1;
+    --el-color-info-light-8: #e9eaec;
+    --el-color-info-light-9: #f4f5f6;
+    --el-color-info-dark-2: #72777e;
+
+    // 文字 / 边框 / 填充
+    --el-text-color-primary: #{$text-primary};
+    --el-text-color-regular: #{$text-regular};
+    --el-text-color-secondary: #{$text-secondary};
+    --el-text-color-placeholder: #{$text-placeholder};
+
+    --el-border-color: #{$border-color-base};
+    --el-border-color-light: #{$border-color-light};
+    --el-border-color-lighter: #{$border-color-lighter};
+    --el-border-color-extra-light: #{$border-color-lighter};
+
+    --el-bg-color-page: #{$bg-color-base};
+    --el-fill-color-light: #{$bg-color-hover};
+    --el-fill-color-lighter: #{$bg-color-base};
+
+    // 圆角
+    --el-border-radius-base: #{$radius-small};
+    --el-border-radius-small: 4px;
+    --el-border-radius-round: 100px;
+
+    // 阴影
+    --el-box-shadow-light: #{$shadow-card};
+    --el-box-shadow: #{$shadow-popup};
+}
+
+// ---------- 全局基底 ----------
+body {
+    font-family: $font-family-base;
+    color: $text-primary;
+    background-color: $bg-color-base;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+// 全局细滚动条
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-thumb {
+    background: #d3d8e0;
+    border-radius: 3px;
+
+    &:hover { background: #bcc3cd; }
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+// ---------- 按钮 ----------
+.el-button {
+    font-weight: 500;
+    transition: $transition-base;
+
+    &.el-button--primary {
+        --el-button-hover-bg-color: #{$color-primary-hover};
+        --el-button-hover-border-color: #{$color-primary-hover};
+
+        &:active {
+            background-color: $color-primary-active;
+            border-color: $color-primary-active;
+        }
+    }
+
+    // 默认按钮：hover 浅蓝底 + 主色文字（飞书式）
+    &.el-button--default:not(.is-text):not(.is-link) {
+        &:hover,
+        &:focus {
+            color: $color-primary;
+            background-color: $color-primary-light;
+            border-color: rgba(51, 112, 255, 0.5);
+        }
+    }
+}
+
+// ---------- 卡片 ----------
+.el-card {
+    --el-card-border-color: #{$border-color-lighter};
+    --el-card-border-radius: #{$radius-large};
+    --el-card-padding: 20px;
+
+    box-shadow: $shadow-card;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+    .el-card__header {
+        border-bottom-color: $border-color-lighter;
+        font-weight: 600;
+    }
+}
+
+// ---------- 对话框 / 消息弹层 ----------
+.el-dialog {
+    border-radius: $radius-large;
+    box-shadow: $shadow-popup;
+
+    .el-dialog__header {
+        font-weight: 600;
+    }
+}
+
+.el-message-box {
+    border-radius: $radius-large;
+}
+
+.el-popper.is-light {
+    border-color: $border-color-lighter;
+    box-shadow: $shadow-popup;
+}
+
+.el-dropdown-menu {
+    border-radius: $radius-base;
+    padding: 4px;
+}
+
+// ---------- 输入框 ----------
+.el-input__wrapper,
+.el-textarea__inner {
+    transition: box-shadow $transition-fast, background-color $transition-fast;
+}
+
+// ---------- 表格 ----------
+.el-table {
+    --el-table-header-bg-color: #{$bg-color-base};
+    --el-table-header-text-color: #{$text-regular};
+    --el-table-border-color: #{$border-color-lighter};
+
+    th.el-table__cell {
+        font-size: 13px;
+        font-weight: 600;
+    }
+}
+
+// ---------- 分页 ----------
+.el-pagination {
+    --el-pagination-hover-color: #{$color-primary};
+
+    .el-pager li {
+        border-radius: $radius-small;
+    }
+}
+
+// ---------- 标签 ----------
+.el-tag {
+    border-radius: $radius-small;
+}
+
+// ---------- 空状态 ----------
+.el-empty__description p {
+    color: $text-secondary;
+}
+
+// ---------- 菜单（浅色侧边栏通用样式） ----------
+.el-menu {
+    border-right: none;
+
+    .el-menu-item,
+    .el-sub-menu__title {
+        height: 44px;
+        line-height: 44px;
+        margin: 2px 10px;
+        border-radius: $radius-base;
+        color: $text-regular;
+        transition: $transition-base;
+
+        &:hover {
+            background-color: $bg-color-hover;
+            color: $text-primary;
+        }
+
+        .el-icon {
+            color: $text-secondary;
+            transition: $transition-base;
+        }
+    }
+
+    .el-menu-item.is-active {
+        background-color: $color-primary-light;
+        color: $color-primary;
+        font-weight: 600;
+
+        .el-icon { color: $color-primary; }
+
+        &:hover { background-color: $color-primary-light; }
+    }
+
+    // 子菜单缩进层级（商城/商家中心二级项）
+    .el-menu .el-menu-item {
+        font-size: 13.5px;
+    }
+}

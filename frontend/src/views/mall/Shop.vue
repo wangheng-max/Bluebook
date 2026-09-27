@@ -322,15 +322,15 @@ watch(merchantUserId, () => {
 
         .product-item {
             border: 1px solid #ebeef5;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease-out;
             background: #fff;
 
             &:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+                transform: translateY(-4px);
+                box-shadow: 0 6px 18px 0 rgba(31, 35, 41, 0.08);
             }
 
             .product-cover {
@@ -339,7 +339,10 @@ watch(merchantUserId, () => {
                 object-fit: cover;
                 display: block;
                 background: #f5f7fa;
+                transition: transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
             }
+
+            &:hover .product-cover { transform: scale(1.04); }
 
             .p-name {
                 padding: 10px 12px 4px;
